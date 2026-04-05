@@ -1,2 +1,4 @@
+# 🤙 Book a call
+
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/x0000ff/ai-for-developers-project-386/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/x0000ff/ai-for-developers-project-386/actions)
