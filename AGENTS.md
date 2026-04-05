@@ -10,6 +10,10 @@ Hexlet educational project - "Book a call" scheduling app (Cal.com clone, no aut
 ## Dev Commands
 No dev commands yet - project has no code.
 
+## Tech Stack
+- TypeSpec (https://typespec.io/) for API design
+- Docker for deployment
+
 ## Notes
 - Russian-language README describes the project intent
 - Two roles: calendar owner (can create event types, view bookings) and guest (can browse event types, book slots)
