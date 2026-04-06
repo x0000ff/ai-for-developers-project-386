@@ -8,7 +8,24 @@ Hexlet educational project - "Book a call" scheduling app (Cal.com clone, no aut
 - Tests run via Hexlet project action: `hexlet-project-action@release`
 
 ## Dev Commands
-No dev commands yet - project has no code.
+
+```bash
+pnpm install                  # установка зависимостей
+pnpm dev                      # запуск всех пакетов параллельно (dev mode)
+pnpm build                    # production сборка (api → frontend)
+pnpm typecheck                # TypeScript проверка всех пакетов
+pnpm lint                     # ESLint
+pnpm format                   # Prettier
+
+# Отдельные пакеты
+pnpm --filter @app/api build       # компиляция TypeSpec → TS типы (нужно перед frontend)
+pnpm --filter @app/frontend dev    # только frontend dev server
+pnpm --filter @app/backend dev     # только backend dev server
+
+# База данных
+pnpm --filter @app/backend db:generate   # сгенерировать SQL миграции из Drizzle схемы
+pnpm --filter @app/backend db:migrate    # применить миграции
+```
 
 ## Tech Stack
 - **API Design:** TypeSpec (https://typespec.io/) → openapi-typescript for TS client generation

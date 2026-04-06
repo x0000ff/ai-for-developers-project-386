@@ -64,3 +64,14 @@ out/
 .yarn/unplugged
 .yarn/install-state.gz
 .pnp.*
+
+# Generated files
+packages/api/tsp-output/
+packages/api/generated/
+
+# Build output
+packages/backend/dist/
+packages/frontend/dist/
+
+# Database
+packages/backend/*.db
