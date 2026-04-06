@@ -11,8 +11,10 @@ Hexlet educational project - "Book a call" scheduling app (Cal.com clone, no aut
 No dev commands yet - project has no code.
 
 ## Tech Stack
-- TypeSpec (https://typespec.io/) for API design
-- Docker for deployment
+- **API Design:** TypeSpec (https://typespec.io/) → openapi-typescript for TS client generation
+- **Frontend:** TypeScript, Vite, React, Mantine, React Router
+- **Backend:** Fastify (Node.js), SQLite, Drizzle ORM + Drizzle Kit
+- **Deploy:** Docker — single container, Fastify serves Vite build as static files
 
 ## Notes
 - Russian-language README describes the project intent
