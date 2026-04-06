@@ -1,4 +1,4 @@
-import { CalendarDays, Phone, Settings2 } from 'lucide-react';
+import { CalendarDays, Phone, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function Navbar() {
@@ -103,7 +103,7 @@ export function Navbar() {
               letterSpacing: '-0.01em',
             }}
           >
-            <Settings2 size={14} strokeWidth={2} />
+            <ShieldCheck size={14} strokeWidth={2} />
             Admin
           </Link>
         </div>
