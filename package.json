@@ -1,6 +1,7 @@
 {
   "name": "book-a-call",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "pnpm --parallel -r dev",
     "build": "pnpm --filter api build && pnpm --filter frontend build",
@@ -9,10 +10,9 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8",
-    "@typescript-eslint/parser": "^8",
     "eslint": "^9",
     "prettier": "^3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-eslint": "^8"
   }
 }
