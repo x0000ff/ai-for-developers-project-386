@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./index.ts",
   "scripts": {
-    "build": "tsp compile . && openapi-typescript tsp-output/@typespec/openapi3/openapi.yaml -o generated/schema.d.ts"
+    "build": "tsp compile src/main.tsp && openapi-typescript tsp-output/@typespec/openapi3/openapi.yaml -o generated/schema.d.ts"
   },
   "devDependencies": {
     "@typespec/compiler": "^0.63",
