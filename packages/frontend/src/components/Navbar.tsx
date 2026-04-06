@@ -1,12 +1,7 @@
-import { CalendarDays, Phone, ShieldCheck } from 'lucide-react';
+import { CalendarDays, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function Navbar() {
-  const scrollToBook = (e: React.MouseEvent) => {
-    e.preventDefault();
-    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <nav
       style={{
@@ -31,7 +26,10 @@ export function Navbar() {
         }}
       >
         {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Link
+          to="/"
+          style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}
+        >
           <div
             style={{
               width: 36,
@@ -57,12 +55,12 @@ export function Navbar() {
           >
             Callbook
           </span>
-        </div>
+        </Link>
 
         {/* Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button
-            onClick={scrollToBook}
+<Link
+            to="/admin"
             className="nav-btn-outline"
             style={{
               display: 'flex',
@@ -73,29 +71,6 @@ export function Navbar() {
               borderRadius: 8,
               background: 'transparent',
               color: 'var(--fg)',
-              fontFamily: 'var(--font)',
-              fontWeight: 500,
-              fontSize: 14,
-              cursor: 'pointer',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            <Phone size={14} strokeWidth={2} />
-            Book your call
-          </button>
-
-          <Link
-            to="/admin"
-            className="nav-btn-accent"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 7,
-              padding: '8px 16px',
-              border: '1px solid var(--accent)',
-              borderRadius: 8,
-              background: 'var(--accent)',
-              color: 'var(--accent-fg)',
               fontFamily: 'var(--font)',
               fontWeight: 500,
               fontSize: 14,

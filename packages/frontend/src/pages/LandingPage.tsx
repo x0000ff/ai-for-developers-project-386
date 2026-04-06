@@ -1,4 +1,5 @@
 import { Clock, Phone, ShieldCheck, Users, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 
 const features = [
@@ -76,7 +77,8 @@ export function LandingPage() {
             animationDelay: '240ms',
           }}
         >
-          <button
+          <Link
+            to="/book"
             className="cta-btn"
             style={{
               display: 'inline-flex',
@@ -91,12 +93,13 @@ export function LandingPage() {
               fontWeight: 600,
               fontSize: 16,
               cursor: 'pointer',
+              textDecoration: 'none',
               letterSpacing: '-0.02em',
             }}
           >
             <Phone size={16} strokeWidth={2} />
             Book your call
-          </button>
+          </Link>
         </div>
 
         {/* Feature row */}
