@@ -1,0 +1,7 @@
+node_modules
+.worktrees
+.git
+packages/*/dist
+packages/api/tsp-output
+packages/api/generated
+*.db
