@@ -67,23 +67,6 @@ export function LandingPage() {
           Effortlessly.
         </h1>
 
-        {/* Subtitle */}
-        <p
-          style={{
-            fontFamily: 'var(--font)',
-            fontWeight: 400,
-            fontSize: 18,
-            lineHeight: 1.65,
-            color: 'var(--fg-muted)',
-            marginTop: 24,
-            maxWidth: 460,
-            animation: 'fadeUp 0.45s ease both',
-            animationDelay: '160ms',
-          }}
-        >
-          Schedule time with your team without the endless back-and-forth. Pick a slot, done.
-        </p>
-
         {/* CTA */}
         <div
           id="book"
