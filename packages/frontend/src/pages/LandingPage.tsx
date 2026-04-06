@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, ShieldCheck, Users, Zap } from 'lucide-react';
+import { Clock, Phone, ShieldCheck, Users, Zap } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 
 const features = [
@@ -94,7 +94,7 @@ export function LandingPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            <CalendarDays size={18} strokeWidth={2} />
+            <Phone size={16} strokeWidth={2} />
             Book your call
           </button>
         </div>
