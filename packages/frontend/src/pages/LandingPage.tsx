@@ -21,8 +21,8 @@ export function LandingPage() {
           minHeight: 'calc(100vh - 64px)',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
-          paddingTop: 96,
+          justifyContent: 'flex-start',
+          paddingTop: 80,
           paddingBottom: 96,
         }}
       >
@@ -54,7 +54,7 @@ export function LandingPage() {
           style={{
             fontFamily: 'var(--font)',
             fontWeight: 700,
-            fontSize: 'clamp(3rem, 7.5vw, 5.5rem)',
+            fontSize: 'clamp(3rem, 5vw + 1.5rem, 5.5rem)',
             lineHeight: 1.06,
             letterSpacing: '-0.04em',
             color: 'var(--fg)',
@@ -104,10 +104,8 @@ export function LandingPage() {
 
         {/* Feature row */}
         <div
+          className="feature-row"
           style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '12px 32px',
             marginTop: 64,
             animation: 'fadeUp 0.45s ease both',
             animationDelay: '320ms',

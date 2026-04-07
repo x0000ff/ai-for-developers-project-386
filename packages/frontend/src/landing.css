@@ -68,3 +68,16 @@ body {
 .cta-btn:active {
   transform: scale(0.98);
 }
+
+.feature-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+}
+
+@media (max-width: 480px) {
+  .feature-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
