@@ -72,8 +72,3 @@ packages/api/generated/
 # Build output
 packages/backend/dist/
 packages/frontend/dist/
-
-# Database
-*.db
-*.db-shm
-*.db-wal
