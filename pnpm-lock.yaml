@@ -71,6 +71,9 @@ importers:
       '@mantine/hooks':
         specifier: ^7
         version: 7.17.8(react@18.3.1)
+      lucide-react:
+        specifier: ^1.7.0
+        version: 1.7.0(react@18.3.1)
       react:
         specifier: ^18
         version: 18.3.1
@@ -3270,6 +3273,14 @@ packages:
         integrity: sha512-BpdYkt9EvGl8OfWHDQPISVpcl5xZthb+XPsbELj5AQXxIC8IriDZIQYjBJPEm5rS420sjZ0TLEzRcq5KdBhYrQ==,
       }
 
+  lucide-react@1.7.0:
+    resolution:
+      {
+        integrity: sha512-yI7BeItCLZJTXikmK4KNUGCKoGzSvbKlfCvw44bU4fXAL6v3gYS4uHD1jzsLkfwODYwI6Drw5Tu9Z5ulDe0TSg==,
+      }
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   memoizee@0.4.17:
     resolution:
       {
@@ -6150,6 +6161,10 @@ snapshots:
   lru-queue@0.1.0:
     dependencies:
       es5-ext: 0.10.64
+
+  lucide-react@1.7.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
 
   memoizee@0.4.17:
     dependencies:
