@@ -1,4 +1,5 @@
 import Fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
+import { sql } from 'drizzle-orm';
 import type { Db } from './db/index.js';
 import { eventTypesRoutes } from './routes/eventTypes.js';
 
@@ -6,7 +7,14 @@ export function buildApp(opts: FastifyServerOptions & { db: Db }): FastifyInstan
   const { db, ...fastifyOpts } = opts;
   const app = Fastify({ logger: false, ...fastifyOpts });
 
-  app.get('/health', async () => ({ status: 'ok' }));
+  app.get('/health', async (_req, reply) => {
+    try {
+      db.run(sql`SELECT 1 FROM event_types LIMIT 1`);
+      return { status: 'ok' };
+    } catch {
+      return reply.status(503).send({ status: 'error', reason: 'db_not_ready' });
+    }
+  });
 
   app.register(eventTypesRoutes, { prefix: '/api', db });
 
