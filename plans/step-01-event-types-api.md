@@ -13,12 +13,12 @@
 ## TypeSpec (первым делом)
 
 - Модель `EventType { id: string; name: string; description: string; durationMinutes: int32 }`.
-- Модели запросов `CreateEventTypeRequest`, `UpdateEventTypeRequest` (частичная).
+- Модели запросов `CreateEventTypeRequest`, `UpdateEventTypeRequest` (полная замена, все поля обязательны кроме `description`).
 - Операции:
   - `GET /event-types`
   - `GET /event-types/{id}`
   - `POST /event-types`
-  - `PATCH /event-types/{id}`
+  - `PUT /event-types/{id}`
   - `DELETE /event-types/{id}`
 - Сгенерировать TS-типы (`pnpm --filter @app/api build`).
 

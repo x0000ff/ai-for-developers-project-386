@@ -1,3 +1,6 @@
 {
-  "prefersReducedMotion": true
+  "prefersReducedMotion": true,
+  "permissions": {
+    "allow": ["Bash(npx drizzle-kit:*)"]
+  }
 }
