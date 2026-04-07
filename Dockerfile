@@ -30,6 +30,9 @@ FROM base AS production
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=deps /app/packages/backend/node_modules ./packages/backend/node_modules
+COPY --from=deps /app/packages/backend/package.json ./packages/backend/package.json
 COPY --from=backend-builder /app/packages/backend/dist ./packages/backend/dist
 COPY packages/backend/drizzle ./packages/backend/drizzle
 COPY --from=frontend-builder /app/packages/frontend/dist ./packages/frontend/dist
