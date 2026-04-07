@@ -10,6 +10,7 @@ COPY packages/api/package.json ./packages/api/
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/backend/package.json ./packages/backend/
 RUN pnpm install --frozen-lockfile
+RUN pnpm rebuild better-sqlite3
 
 # Stage: build api types + frontend
 FROM deps AS frontend-builder
