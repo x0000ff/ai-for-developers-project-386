@@ -1,55 +1,105 @@
-This skill will be invoked when the user wants to create a PRD. You should go through the steps below. You may skip steps if you don't consider them necessary.
+This skill is invoked when the user wants to create a PRD. Follow the steps below strictly.
 
-1. Ask the user for a long, detailed description of the problem they want to solve and any potential ideas for solutions.
+---
 
-2. Explore the repo to verify their assertions and understand the current state of the codebase.
+## Phase 1: Discovery
 
-3. Interview the user relentlessly about every aspect of this plan until you reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one.
+Display this header before starting:
 
-4. Once you have a complete understanding of the problem and solution, use the template below to write the PRD. The PRD should be written in the `plans/prd-name.md` file.
+```
+╔════════════════════════════════════════╗
+║         📋 PRD Interview Mode          ║
+║   Answer questions one by one.         ║
+╚════════════════════════════════════════╝
+```
 
-<prd-template>
+Ask each question **individually** using AskUserQuestion. Wait for the answer before moving to the next. Never bundle multiple questions in one message.
 
+Show a progress label before each question: `[Question N / 8]`
+
+**Question sequence:**
+
+1. `[Question 1 / 8]` Опиши проблему подробно. Что не работает или чего не хватает?
+2. `[Question 2 / 8]` Что существует сейчас? Какое текущее состояние системы?
+3. `[Question 3 / 8]` Как выглядит успех? Что изменится для пользователя?
+4. `[Question 4 / 8]` Кто пользователи / акторы этой фичи?
+5. `[Question 5 / 8]` Какие фичи обязательны (must-have)?
+6. `[Question 6 / 8]` Что явно выходит за рамки этого PRD?
+7. `[Question 7 / 8]` Есть ли технические, временные или ресурсные ограничения?
+8. `[Question 8 / 8]` Есть ли идеи по реализации или технические предпочтения?
+
+---
+
+## Phase 2: Codebase Exploration
+
+After collecting answers, explore the repo silently to verify claims and understand the current state. Look for existing modules, patterns, and constraints relevant to the feature.
+
+---
+
+## Phase 3: Confirmation
+
+Display a structured recap of everything learned:
+
+```
+┌─────────────────────────────────────────┐
+│           📝 Interview Summary          │
+├─────────────────────────────────────────┤
+│ Problem   : <one line>                  │
+│ Users     : <one line>                  │
+│ Must-have : <bullet list>               │
+│ Out of scope: <bullet list>             │
+│ Constraints: <one line>                 │
+└─────────────────────────────────────────┘
+```
+
+Ask: `[Confirmation]` Всё верно? Что нужно уточнить или изменить перед написанием PRD?
+
+Wait for confirmation before proceeding.
+
+---
+
+## Phase 4: Write the PRD
+
+Write the PRD to `plans/prd-<name>.md` using this template:
+
+```md
 ## Problem Statement
 
-The problem that the user is facing, from the user's perspective.
+<problem from user's perspective>
 
 ## Solution
 
-The solution to the problem, from the user's perspective.
+<solution from user's perspective>
 
 ## User Stories
 
-A LONG, numbered list of user stories. Each user story should be in the format of:
+A numbered list of user stories. Each in the format:
+1. As a <actor>, I want <feature>, so that <benefit>
 
-1. As an <actor>, I want a <feature>, so that <benefit>
-
-<user-story-example>
-1. As a mobile bank customer, I want to see balance on my accounts, so that I can make better informed decisions about my spending
-</user-story-example>
-
-This list of user stories should be extremely extensive and cover all aspects of the feature.
+(Be exhaustive — cover all aspects of the feature.)
 
 ## Implementation Decisions
 
-A list of implementation decisions that were made. This can include:
-
-- The modules that will be built/modified
-- The interfaces of those modules that will be modified
-- Technical clarifications from the developer
+- Modules to build/modify
+- Interface changes
 - Architectural decisions
 - Schema changes
 - API contracts
-- Specific interactions
+- Key interactions
 
-Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
+Do NOT include specific file paths or code snippets.
 
 ## Out of Scope
 
-A description of the things that are out of scope for this PRD.
+<what is explicitly excluded>
 
 ## Further Notes
 
-Any further notes about the feature.
+<any additional context>
+```
 
-</prd-template>
+After writing, display:
+
+```
+✅ PRD written to plans/prd-<name>.md
+```
