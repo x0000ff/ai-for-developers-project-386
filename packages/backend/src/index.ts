@@ -1,19 +1,17 @@
 import fastifyStatic from '@fastify/static';
-import Fastify from 'fastify';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { buildApp } from './app.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const app = Fastify({ logger: true });
+const app = buildApp({ logger: true });
 
 // Serve frontend build
 app.register(fastifyStatic, {
   root: path.join(__dirname, '../../frontend/dist'),
   prefix: '/',
 });
-
-// API routes will be added here
 
 const start = async () => {
   try {

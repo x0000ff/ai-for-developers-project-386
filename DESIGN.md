@@ -4,16 +4,16 @@ Design system reference for the Callbook frontend.
 
 ## Color Palette (CSS variables in `landing.css`)
 
-| Variable        | Value                        | Usage                          |
-|-----------------|------------------------------|--------------------------------|
-| `--bg`          | `#f2ede6`                    | Page background (warm beige)   |
-| `--bg-nav`      | `rgba(242, 237, 230, 0.85)`  | Navbar (semi-transparent)      |
-| `--border`      | `#d9d0c4`                    | Borders, dividers              |
-| `--fg`          | `#1c1917`                    | Primary text (warm near-black) |
-| `--fg-muted`    | `#78716c`                    | Secondary / hint text          |
-| `--accent`      | `#c97a1a`                    | Amber — CTAs, icons, badges    |
-| `--accent-hover`| `#a86015`                    | Hover state for accent         |
-| `--accent-fg`   | `#ffffff`                    | Text/icons on accent background|
+| Variable         | Value                       | Usage                           |
+| ---------------- | --------------------------- | ------------------------------- |
+| `--bg`           | `#f2ede6`                   | Page background (warm beige)    |
+| `--bg-nav`       | `rgba(242, 237, 230, 0.85)` | Navbar (semi-transparent)       |
+| `--border`       | `#d9d0c4`                   | Borders, dividers               |
+| `--fg`           | `#1c1917`                   | Primary text (warm near-black)  |
+| `--fg-muted`     | `#78716c`                   | Secondary / hint text           |
+| `--accent`       | `#c97a1a`                   | Amber — CTAs, icons, badges     |
+| `--accent-hover` | `#a86015`                   | Hover state for accent          |
+| `--accent-fg`    | `#ffffff`                   | Text/icons on accent background |
 
 Always use these variables — never hardcode colors.
 
@@ -35,12 +35,14 @@ Always use these variables — never hardcode colors.
 ## Components
 
 **Navbar (`Navbar.tsx`)**
+
 - Sticky, `top: 0`, `zIndex: 100`
 - `borderBottom: '1px solid var(--border)'`, backdrop blur (`blur(10px)`)
 - Logo: 36×36 accent square (`borderRadius: 8`), white lucide icon inside
 - Nav buttons: outlined (`nav-btn-outline`) or accent (`nav-btn-accent`) CSS classes
 
 **Buttons**
+
 - `display: 'inline-flex'`, `alignItems: 'center'`, `gap: 10`
 - `borderRadius: 8`, `padding: '14px 28px'` (primary) / `'10px 20px'` (secondary)
 - Always include a lucide icon alongside text
@@ -48,10 +50,12 @@ Always use these variables — never hardcode colors.
 - Hover/active states are handled via CSS classes in `landing.css`
 
 **Icon Boxes**
+
 - Page hero icons: 64×64, `borderRadius: 16`, accent background, white icon (size 28)
 - Navbar logo icon: 36×36, `borderRadius: 8`, accent background, white icon (size 18)
 
 **Badge / Tag**
+
 - `border: '1px solid var(--accent)'`, `borderRadius: 6`, `padding: '5px 12px'`
 - `fontSize: 11`, `fontWeight: 600`, `letterSpacing: '0.09em'`, `textTransform: 'uppercase'`
 - Include a small lucide icon (size 11) before text

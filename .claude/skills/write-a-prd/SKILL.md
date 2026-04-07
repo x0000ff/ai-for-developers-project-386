@@ -74,6 +74,7 @@ Write the PRD to `plans/prd-<name>.md` using this template:
 ## User Stories
 
 A numbered list of user stories. Each in the format:
+
 1. As a <actor>, I want <feature>, so that <benefit>
 
 (Be exhaustive — cover all aspects of the feature.)

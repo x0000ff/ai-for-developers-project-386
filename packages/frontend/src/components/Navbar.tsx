@@ -59,7 +59,7 @@ export function Navbar() {
 
         {/* Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-<Link
+          <Link
             to="/admin"
             className="nav-btn-outline"
             style={{

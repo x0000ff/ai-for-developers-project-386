@@ -6,6 +6,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
@@ -19,6 +20,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7",
     "drizzle-kit": "^0.20",
-    "tsx": "^4"
+    "tsx": "^4",
+    "vitest": "^2"
   }
 }
