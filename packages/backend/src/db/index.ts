@@ -9,5 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbUrl = process.env.DATABASE_URL ?? path.join(__dirname, '../../../app.db');
 
 export const sqlite = new Database(dbUrl);
+sqlite.pragma('journal_mode = WAL');
+sqlite.pragma('foreign_keys = ON');
 export const db = drizzle(sqlite, { schema });
 export type Db = typeof db;

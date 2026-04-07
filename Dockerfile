@@ -1,10 +1,11 @@
-FROM node:22-alpine AS base
+FROM node:22-slim AS base
 RUN npm install -g pnpm
 
-# Stage: install all dependencies
+# Stage: install all dependencies (includes native compilation of better-sqlite3)
 FROM base AS deps
+RUN apt-get update && apt-get install -y --no-install-recommends python3 build-essential && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
 COPY packages/api/package.json ./packages/api/
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/backend/package.json ./packages/backend/
@@ -24,13 +25,11 @@ COPY tsconfig.base.json ./
 COPY packages/backend ./packages/backend
 RUN pnpm --filter @app/backend build
 
-# Stage: production
+# Stage: production (no build tools needed — node_modules copied from deps)
 FROM base AS production
 WORKDIR /app
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY packages/backend/package.json ./packages/backend/
-RUN pnpm install --frozen-lockfile --prod --filter @app/backend
-
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/package.json ./package.json
 COPY --from=backend-builder /app/packages/backend/dist ./packages/backend/dist
 COPY packages/backend/drizzle ./packages/backend/drizzle
 COPY --from=frontend-builder /app/packages/frontend/dist ./packages/frontend/dist
