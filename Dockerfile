@@ -32,6 +32,7 @@ COPY packages/backend/package.json ./packages/backend/
 RUN pnpm install --frozen-lockfile --prod --filter @app/backend
 
 COPY --from=backend-builder /app/packages/backend/dist ./packages/backend/dist
+COPY packages/backend/drizzle ./packages/backend/drizzle
 COPY --from=frontend-builder /app/packages/frontend/dist ./packages/frontend/dist
 
 EXPOSE 3000
