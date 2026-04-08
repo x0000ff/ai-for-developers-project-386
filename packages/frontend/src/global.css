@@ -7,6 +7,8 @@
   --accent: #c97a1a;
   --accent-hover: #a86015;
   --accent-fg: #ffffff;
+  --danger: #b33232;
+  --danger-hover: #8a2828;
   --font: 'DM Sans', sans-serif;
 }
 
@@ -101,6 +103,14 @@ body {
 .mantine-Tabs-tab[data-active] {
   background: var(--accent) !important;
   color: white !important;
+}
+
+/* Danger button (delete actions) */
+.danger-btn {
+  transition: background 0.15s ease;
+}
+.danger-btn:hover {
+  background: var(--danger-hover) !important;
 }
 
 /* Override Mantine subtle variant hover — replace default blue with neutral gray */

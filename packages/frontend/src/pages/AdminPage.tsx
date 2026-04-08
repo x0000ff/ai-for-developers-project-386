@@ -720,8 +720,8 @@ export function AdminPage() {
         }
         centered
         styles={{
-          content: { borderRadius: 14 },
-          header: { paddingBottom: 8 },
+          content: { borderRadius: 14, background: 'var(--bg)' },
+          header: { paddingBottom: 8, background: 'var(--bg)' },
         }}
       >
         {createError && (
@@ -756,8 +756,8 @@ export function AdminPage() {
         }
         centered
         styles={{
-          content: { borderRadius: 14 },
-          header: { paddingBottom: 8 },
+          content: { borderRadius: 14, background: 'var(--bg)' },
+          header: { paddingBottom: 8, background: 'var(--bg)' },
         }}
       >
         {editError && (
@@ -799,8 +799,8 @@ export function AdminPage() {
         centered
         size="sm"
         styles={{
-          content: { borderRadius: 14 },
-          header: { paddingBottom: 8 },
+          content: { borderRadius: 14, background: 'var(--bg)' },
+          header: { paddingBottom: 8, background: 'var(--bg)' },
         }}
       >
         <Stack gap={16}>
@@ -824,12 +824,18 @@ export function AdminPage() {
               Отмена
             </Button>
             <Button
-              color="red"
               onClick={handleDeleteBooking}
               loading={deleteBookingLoading}
               data-testid="delete-booking-confirm"
+              className="danger-btn"
               styles={{
-                root: { fontFamily: 'var(--font)', fontWeight: 600, fontSize: 14 },
+                root: {
+                  fontFamily: 'var(--font)',
+                  fontWeight: 600,
+                  fontSize: 14,
+                  background: 'var(--danger)',
+                  color: '#fff',
+                },
               }}
             >
               Удалить
@@ -858,8 +864,8 @@ export function AdminPage() {
         centered
         size="sm"
         styles={{
-          content: { borderRadius: 14 },
-          header: { paddingBottom: 8 },
+          content: { borderRadius: 14, background: 'var(--bg)' },
+          header: { paddingBottom: 8, background: 'var(--bg)' },
         }}
       >
         <Stack gap={16}>
@@ -868,7 +874,7 @@ export function AdminPage() {
             действие нельзя отменить.
           </Text>
           {deleteError && (
-            <Text size="sm" style={{ color: '#dc2626', fontFamily: 'var(--font)' }}>
+            <Text size="sm" style={{ color: 'var(--danger)', fontFamily: 'var(--font)' }}>
               {deleteError}
             </Text>
           )}
@@ -889,11 +895,17 @@ export function AdminPage() {
               Отмена
             </Button>
             <Button
-              color="red"
               onClick={handleDelete}
               loading={deleteLoading}
+              className="danger-btn"
               styles={{
-                root: { fontFamily: 'var(--font)', fontWeight: 600, fontSize: 14 },
+                root: {
+                  fontFamily: 'var(--font)',
+                  fontWeight: 600,
+                  fontSize: 14,
+                  background: 'var(--danger)',
+                  color: '#fff',
+                },
               }}
             >
               Удалить
