@@ -53,7 +53,7 @@ export function Navbar() {
               letterSpacing: '-0.02em',
             }}
           >
-            Callbook
+            Созвончик 🤙
           </span>
         </Link>
 

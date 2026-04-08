@@ -1,6 +1,6 @@
 # DESIGN.md
 
-Design system reference for the Callbook frontend.
+Design system reference for the "Созвончик 🤙" frontend.
 
 ## Color Palette (CSS variables in `global.css`)
 
