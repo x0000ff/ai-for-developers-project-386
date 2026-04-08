@@ -79,7 +79,7 @@ export function Navbar() {
             }}
           >
             <ShieldCheck size={14} strokeWidth={2} />
-            Admin
+            Админка
           </Link>
         </div>
       </div>
