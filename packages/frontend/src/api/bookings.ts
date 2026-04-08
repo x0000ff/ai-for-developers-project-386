@@ -35,4 +35,9 @@ export const bookingsApi = {
     });
     return handleResponse<Booking>(response);
   },
+
+  listUpcoming: async (): Promise<Booking[]> => {
+    const response = await fetch(`${API_BASE_URL}/api/bookings`);
+    return handleResponse<Booking[]>(response);
+  },
 };

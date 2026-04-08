@@ -1,6 +1,7 @@
+import { MantineProvider } from '@mantine/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Booking, EventType, Slot } from '@app/api';
 import * as eventTypesModule from '../api/eventTypes';
 import * as bookingsModule from '../api/bookings';
@@ -19,6 +20,7 @@ vi.mock('../api/bookings', async (importOriginal) => {
     bookingsApi: {
       getSlots: vi.fn(),
       createBooking: vi.fn(),
+      listUpcoming: vi.fn(),
     },
   };
 });
@@ -45,16 +47,33 @@ const mockBooking: Booking = {
 
 function renderPage(search = '?eventTypeId=1') {
   return render(
-    <MemoryRouter initialEntries={[`/book${search}`]}>
-      <BookCallPage />
-    </MemoryRouter>,
+    <MantineProvider>
+      <MemoryRouter initialEntries={[`/book${search}`]}>
+        <BookCallPage />
+      </MemoryRouter>
+    </MantineProvider>,
   );
+}
+
+/** Find the enabled day button with a given day number in the Calendar */
+function getCalendarDay(day: number) {
+  const buttons = screen.getAllByRole('button');
+  const match = buttons.find(
+    (btn) => btn.textContent?.trim() === String(day) && !btn.hasAttribute('data-disabled'),
+  );
+  if (!match) throw new Error(`Calendar day button "${day}" not found or disabled`);
+  return match;
 }
 
 describe('BookCallPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date('2026-04-08T12:00:00.000Z') });
     vi.mocked(eventTypesModule.eventTypesApi.list).mockResolvedValue(mockEventTypes);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('отображает сетку слотов после выбора даты', async () => {
@@ -64,7 +83,7 @@ describe('BookCallPage', () => {
 
     await screen.findByTestId('event-type-select');
 
-    fireEvent.change(screen.getByTestId('date-input'), { target: { value: '2026-04-10' } });
+    fireEvent.click(getCalendarDay(10));
 
     const grid = await screen.findByTestId('slots-grid');
     expect(grid).toBeInTheDocument();
@@ -81,7 +100,7 @@ describe('BookCallPage', () => {
     renderPage();
 
     await screen.findByTestId('event-type-select');
-    fireEvent.change(screen.getByTestId('date-input'), { target: { value: '2026-04-10' } });
+    fireEvent.click(getCalendarDay(10));
 
     await waitFor(() => {
       expect(screen.getByText(/нет доступных слотов/i)).toBeInTheDocument();
@@ -95,7 +114,7 @@ describe('BookCallPage', () => {
     renderPage();
 
     await screen.findByTestId('event-type-select');
-    fireEvent.change(screen.getByTestId('date-input'), { target: { value: '2026-04-10' } });
+    fireEvent.click(getCalendarDay(10));
 
     await screen.findByTestId('slots-grid');
     fireEvent.click(screen.getByTestId('slot-2026-04-10T10:00:00.000Z'));
@@ -126,7 +145,7 @@ describe('BookCallPage', () => {
     renderPage();
 
     await screen.findByTestId('event-type-select');
-    fireEvent.change(screen.getByTestId('date-input'), { target: { value: '2026-04-10' } });
+    fireEvent.click(getCalendarDay(10));
 
     await screen.findByTestId('slots-grid');
     fireEvent.click(screen.getByTestId('slot-2026-04-10T10:00:00.000Z'));

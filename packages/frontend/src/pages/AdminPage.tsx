@@ -11,12 +11,23 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core';
-import { Edit2, Plus, ShieldCheck, Trash2 } from 'lucide-react';
+import { CalendarClock, Edit2, Plus, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { bookingsApi } from '../api/bookings';
 import { eventTypesApi } from '../api/eventTypes';
 import { Navbar } from '../components/Navbar';
 
-import type { EventType } from '@app/api';
+import type { Booking, EventType } from '@app/api';
+
+function formatDateTime(iso: string): string {
+  return new Date(iso).toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 interface EventTypeFormData {
   name: string;
@@ -140,6 +151,10 @@ export function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
+  const [bookingsError, setBookingsError] = useState<string | null>(null);
+
   const [createOpen, setCreateOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -154,7 +169,21 @@ export function AdminPage() {
 
   useEffect(() => {
     loadEventTypes();
+    loadBookings();
   }, []);
+
+  async function loadBookings() {
+    setBookingsLoading(true);
+    setBookingsError(null);
+    try {
+      const data = await bookingsApi.listUpcoming();
+      setBookings(data);
+    } catch (err) {
+      setBookingsError(err instanceof Error ? err.message : 'Ошибка загрузки');
+    } finally {
+      setBookingsLoading(false);
+    }
+  }
 
   async function loadEventTypes() {
     setLoading(true);
@@ -461,6 +490,214 @@ export function AdminPage() {
             </Table>
           </div>
         )}
+        {/* Upcoming Bookings Section */}
+        <div style={{ marginTop: 48 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 20,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  background: 'var(--accent)',
+                  borderRadius: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <CalendarClock size={18} color="white" strokeWidth={2} />
+              </div>
+              <div>
+                <h2
+                  style={{
+                    fontFamily: 'var(--font)',
+                    fontWeight: 700,
+                    fontSize: 20,
+                    letterSpacing: '-0.04em',
+                    color: 'var(--fg)',
+                    margin: 0,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  Предстоящие встречи
+                </h2>
+              </div>
+            </div>
+
+            <button
+              onClick={loadBookings}
+              disabled={bookingsLoading}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '8px 16px',
+                background: 'white',
+                color: 'var(--fg)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                fontFamily: 'var(--font)',
+                fontWeight: 500,
+                fontSize: 13,
+                cursor: bookingsLoading ? 'not-allowed' : 'pointer',
+                opacity: bookingsLoading ? 0.6 : 1,
+              }}
+            >
+              <RefreshCw size={14} strokeWidth={2} />
+              Обновить
+            </button>
+          </div>
+
+          {bookingsLoading && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: 120,
+              }}
+            >
+              <Loader size="md" color="var(--accent)" />
+            </div>
+          )}
+
+          {!bookingsLoading && bookingsError && (
+            <div
+              style={{
+                padding: '16px 20px',
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: 10,
+                fontFamily: 'var(--font)',
+                fontSize: 14,
+                color: '#dc2626',
+              }}
+            >
+              {bookingsError}
+            </div>
+          )}
+
+          {!bookingsLoading && !bookingsError && bookings.length === 0 && (
+            <div
+              data-testid="bookings-empty"
+              style={{
+                textAlign: 'center',
+                padding: '48px 24px',
+                border: '1px dashed var(--border)',
+                borderRadius: 12,
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: 'var(--font)',
+                  fontSize: 15,
+                  color: 'var(--fg-muted)',
+                  margin: 0,
+                }}
+              >
+                Предстоящих встреч пока нет.
+              </p>
+            </div>
+          )}
+
+          {!bookingsLoading && !bookingsError && bookings.length > 0 && (
+            <div
+              data-testid="bookings-table"
+              style={{
+                border: '1px solid var(--border)',
+                borderRadius: 12,
+                overflow: 'hidden',
+                background: 'white',
+              }}
+            >
+              <Table
+                highlightOnHover
+                styles={{
+                  thead: { background: '#faf9f7' },
+                  th: {
+                    fontFamily: 'var(--font)',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                    color: 'var(--fg-muted)',
+                    padding: '12px 16px',
+                  },
+                  td: {
+                    fontFamily: 'var(--font)',
+                    fontSize: 14,
+                    color: 'var(--fg)',
+                    padding: '14px 16px',
+                    verticalAlign: 'middle',
+                  },
+                }}
+              >
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Начало</Table.Th>
+                    <Table.Th>Конец</Table.Th>
+                    <Table.Th>Тип встречи</Table.Th>
+                    <Table.Th>Гость</Table.Th>
+                    <Table.Th>Email</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {bookings.map((b) => (
+                    <Table.Tr key={b.id}>
+                      <Table.Td>
+                        <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                          {formatDateTime(b.startsAt)}
+                        </span>
+                      </Table.Td>
+                      <Table.Td>
+                        <span
+                          style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--fg-muted)' }}
+                        >
+                          {formatDateTime(b.endsAt)}
+                        </span>
+                      </Table.Td>
+                      <Table.Td>
+                        {b.eventTypeId === null ? (
+                          <span
+                            data-testid="deleted-type-badge"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '3px 8px',
+                              background: 'var(--bg)',
+                              border: '1px solid var(--border)',
+                              borderRadius: 6,
+                              fontSize: 12,
+                              fontWeight: 500,
+                              color: 'var(--fg-muted)',
+                              fontStyle: 'italic',
+                            }}
+                          >
+                            Тип удалён
+                          </span>
+                        ) : (
+                          <span style={{ fontWeight: 500 }}>{b.eventTypeName}</span>
+                        )}
+                      </Table.Td>
+                      <Table.Td>{b.guestName}</Table.Td>
+                      <Table.Td>
+                        <span style={{ color: 'var(--fg-muted)' }}>{b.guestEmail}</span>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Create Modal */}
