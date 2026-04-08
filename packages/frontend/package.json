@@ -10,7 +10,9 @@
   "dependencies": {
     "@app/api": "workspace:*",
     "@mantine/core": "^7",
+    "@mantine/dates": "^7.17.8",
     "@mantine/hooks": "^7",
+    "dayjs": "^1.11.20",
     "lucide-react": "^1.7.0",
     "react": "^18",
     "react-dom": "^18",

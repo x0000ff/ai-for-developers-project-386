@@ -1,4 +1,5 @@
-import { Calendar, Check, Clock, Mail, User } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronDown, Clock, Mail, User } from 'lucide-react';
+import { Calendar } from '@mantine/dates';
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { Booking, EventType, Slot } from '@app/api';
@@ -28,7 +29,7 @@ export function BookCallPage() {
   const [eventTypesLoading, setEventTypesLoading] = useState(true);
 
   const [selectedEventTypeId, setSelectedEventTypeId] = useState(initialEventTypeId);
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const [slots, setSlots] = useState<Slot[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
@@ -55,7 +56,9 @@ export function BookCallPage() {
     setSubmitError(null);
     setIsConflict(false);
 
-    if (!selectedEventTypeId || !selectedDate) {
+    const dateStr = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
+
+    if (!selectedEventTypeId || !dateStr) {
       setSlots([]);
       return;
     }
@@ -64,7 +67,7 @@ export function BookCallPage() {
     setSlotsError(null);
 
     bookingsApi
-      .getSlots(selectedEventTypeId, selectedDate)
+      .getSlots(selectedEventTypeId, dateStr)
       .then(setSlots)
       .catch((err) => setSlotsError(err instanceof Error ? err.message : 'Ошибка загрузки слотов'))
       .finally(() => setSlotsLoading(false));
@@ -92,7 +95,10 @@ export function BookCallPage() {
         setSelectedSlot(null);
         setSlotsLoading(true);
         bookingsApi
-          .getSlots(selectedEventTypeId, selectedDate)
+          .getSlots(
+            selectedEventTypeId,
+            selectedDate ? selectedDate.toISOString().split('T')[0] : '',
+          )
           .then(setSlots)
           .catch(() => {})
           .finally(() => setSlotsLoading(false));
@@ -180,7 +186,7 @@ export function BookCallPage() {
               }}
             >
               <ConfirmRow
-                icon={<Calendar size={15} strokeWidth={2} />}
+                icon={<CalendarIcon size={15} strokeWidth={2} />}
                 label={booking.eventTypeName}
               />
               <ConfirmRow
@@ -244,7 +250,7 @@ export function BookCallPage() {
               fontFamily: 'var(--font)',
             }}
           >
-            <Calendar size={11} strokeWidth={2.5} />
+            <CalendarIcon size={11} strokeWidth={2.5} />
             Бронирование
           </span>
         </div>
@@ -275,43 +281,64 @@ export function BookCallPage() {
           }}
         >
           {/* Event type select */}
-          <Section label="Тип встречи" icon={<Calendar size={15} strokeWidth={2} />}>
+          <Section label="Тип встречи" icon={<CalendarIcon size={15} strokeWidth={2} />}>
             {eventTypesLoading ? (
               <Spinner />
             ) : (
-              <select
-                data-testid="event-type-select"
-                value={selectedEventTypeId}
-                onChange={(e) => setSelectedEventTypeId(e.target.value)}
-                style={selectStyle}
-              >
-                <option value="">Выберите формат…</option>
-                {eventTypes.map((et) => (
-                  <option key={et.id} value={et.id}>
-                    {et.name} · {et.durationMinutes} мин
-                  </option>
-                ))}
-              </select>
+              <div style={{ position: 'relative' }}>
+                <select
+                  data-testid="event-type-select"
+                  value={selectedEventTypeId}
+                  onChange={(e) => setSelectedEventTypeId(e.target.value)}
+                  style={selectStyle}
+                >
+                  <option value="">Выберите формат…</option>
+                  {eventTypes.map((et) => (
+                    <option key={et.id} value={et.id}>
+                      {et.name} · {et.durationMinutes} мин
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  size={15}
+                  strokeWidth={2}
+                  style={{
+                    position: 'absolute',
+                    right: 12,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--fg-muted)',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </div>
             )}
           </Section>
 
           <Divider />
 
           {/* Date picker */}
-          <Section label="Дата" icon={<Calendar size={15} strokeWidth={2} />}>
-            <input
-              data-testid="date-input"
-              type="date"
-              min={today}
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              disabled={!selectedEventTypeId}
+          <Section label="Дата" icon={<CalendarIcon size={15} strokeWidth={2} />}>
+            <div
               style={{
-                ...selectStyle,
                 opacity: selectedEventTypeId ? 1 : 0.5,
-                cursor: selectedEventTypeId ? 'pointer' : 'not-allowed',
+                pointerEvents: selectedEventTypeId ? 'auto' : 'none',
+                display: 'flex',
+                justifyContent: 'center',
               }}
-            />
+            >
+              <Calendar
+                minDate={new Date(today)}
+                getDayProps={(date) => ({
+                  selected:
+                    selectedDate !== null && date.toDateString() === selectedDate.toDateString(),
+                  onClick: () =>
+                    setSelectedDate((prev) =>
+                      prev?.toDateString() === date.toDateString() ? null : date,
+                    ),
+                })}
+              />
+            </div>
           </Section>
 
           {/* Slots */}
@@ -600,7 +627,7 @@ function ConfirmRow({ icon, label }: { icon: React.ReactNode; label: string }) {
 
 const selectStyle: React.CSSProperties = {
   width: '100%',
-  padding: '10px 14px',
+  padding: '10px 36px 10px 14px',
   border: '1px solid var(--border)',
   borderRadius: 8,
   background: 'white',
@@ -608,7 +635,7 @@ const selectStyle: React.CSSProperties = {
   fontSize: 14,
   color: 'var(--fg)',
   cursor: 'pointer',
-  appearance: 'auto',
+  appearance: 'none',
 };
 
 const inputStyle: React.CSSProperties = {
