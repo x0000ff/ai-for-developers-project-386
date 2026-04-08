@@ -128,6 +128,8 @@ export function LandingPage() {
               borderRadius: 16,
               animation: 'fadeUp 0.45s ease both',
               animationDelay: '160ms',
+              maxWidth: 760,
+              margin: '0 auto',
             }}
           >
             <div
