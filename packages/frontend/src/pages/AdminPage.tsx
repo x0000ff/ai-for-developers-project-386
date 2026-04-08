@@ -20,11 +20,16 @@ import { Navbar } from '../components/Navbar';
 
 import type { Booking, EventType } from '@app/api';
 
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('ru-RU', {
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('ru-RU', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
+  });
+}
+
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('ru-RU', {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -588,8 +593,8 @@ export function AdminPage() {
                 >
                   <Table.Thead>
                     <Table.Tr>
-                      <Table.Th>Начало</Table.Th>
-                      <Table.Th>Конец</Table.Th>
+                      <Table.Th>Дата</Table.Th>
+                      <Table.Th>Время</Table.Th>
                       <Table.Th>Тип встречи</Table.Th>
                       <Table.Th>Гость</Table.Th>
                       <Table.Th>Email</Table.Th>
@@ -600,7 +605,7 @@ export function AdminPage() {
                       <Table.Tr key={b.id}>
                         <Table.Td>
                           <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {formatDateTime(b.startsAt)}
+                            {formatDate(b.startsAt)}
                           </span>
                         </Table.Td>
                         <Table.Td>
@@ -610,7 +615,7 @@ export function AdminPage() {
                               color: 'var(--fg-muted)',
                             }}
                           >
-                            {formatDateTime(b.endsAt)}
+                            {formatTime(b.startsAt)} – {formatTime(b.endsAt)}
                           </span>
                         </Table.Td>
                         <Table.Td>
@@ -633,7 +638,17 @@ export function AdminPage() {
                               Тип удалён
                             </span>
                           ) : (
-                            <span style={{ fontWeight: 500 }}>{b.eventTypeName}</span>
+                            <span style={{ fontWeight: 500 }}>
+                              <span style={{ color: 'var(--fg-muted)', fontWeight: 400 }}>
+                                {Math.round(
+                                  (new Date(b.endsAt).getTime() - new Date(b.startsAt).getTime()) /
+                                    60000,
+                                )}{' '}
+                                мин
+                              </span>
+                              {' • '}
+                              {b.eventTypeName}
+                            </span>
                           )}
                         </Table.Td>
                         <Table.Td>{b.guestName}</Table.Td>
