@@ -74,5 +74,5 @@ packages/backend/dist/
 packages/frontend/dist/
 
 # SQLite WAL/SHM files
-*.db-wal
-*.db-shm
+packages/app.db-wal
+packages/app.db-shm
