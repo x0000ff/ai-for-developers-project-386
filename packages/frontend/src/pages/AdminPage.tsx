@@ -269,6 +269,7 @@ export function AdminPage() {
       >
         <Tabs
           defaultValue="event-types"
+          keepMounted
           variant="pills"
           orientation="vertical"
           styles={{
@@ -647,7 +648,7 @@ export function AdminPage() {
                                 мин
                               </span>
                               {' • '}
-                              {b.eventTypeName}
+                              <span>{b.eventTypeName}</span>
                             </span>
                           )}
                         </Table.Td>
