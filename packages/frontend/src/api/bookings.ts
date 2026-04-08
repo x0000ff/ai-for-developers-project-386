@@ -41,6 +41,11 @@ export const bookingsApi = {
     return handleResponse<Booking[]>(response);
   },
 
+  listPast: async (): Promise<Booking[]> => {
+    const response = await fetch(`${API_BASE_URL}/api/bookings/past`);
+    return handleResponse<Booking[]>(response);
+  },
+
   deleteBooking: async (id: string): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/api/bookings/${id}`, { method: 'DELETE' });
     if (!response.ok) {

@@ -15,13 +15,13 @@ vi.mock('../api/eventTypes', () => ({
 const mockEventTypes: EventType[] = [
   {
     id: '1',
-    name: 'Консультация 30 мин',
-    description: 'Короткая онлайн-встреча',
+    name: 'Consultation 30 min',
+    description: 'Short online meeting',
     durationMinutes: 30,
   },
   {
     id: '2',
-    name: 'Стратегическая сессия',
+    name: 'Strategic session',
     description: '',
     durationMinutes: 60,
   },
@@ -38,10 +38,10 @@ function renderPage() {
 describe('LandingPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    i18n.changeLanguage('ru');
+    i18n.changeLanguage('en');
   });
 
-  it('показывает список карточек с типами встреч', async () => {
+  it('shows list of event type cards', async () => {
     vi.mocked(eventTypesModule.eventTypesApi.list).mockResolvedValue(mockEventTypes);
 
     renderPage();
@@ -49,34 +49,34 @@ describe('LandingPage', () => {
     const list = await screen.findByTestId('event-types-list');
     expect(list).toBeInTheDocument();
 
-    expect(screen.getByText('Консультация 30 мин')).toBeInTheDocument();
-    expect(screen.getByText('Короткая онлайн-встреча')).toBeInTheDocument();
-    expect(screen.getByText('30 мин')).toBeInTheDocument();
+    expect(screen.getByText('Consultation 30 min')).toBeInTheDocument();
+    expect(screen.getByText('Short online meeting')).toBeInTheDocument();
+    expect(screen.getByText('30 min')).toBeInTheDocument();
 
-    expect(screen.getByText('Стратегическая сессия')).toBeInTheDocument();
-    expect(screen.getByText('60 мин')).toBeInTheDocument();
+    expect(screen.getByText('Strategic session')).toBeInTheDocument();
+    expect(screen.getByText('60 min')).toBeInTheDocument();
   });
 
-  it('кнопки "Забронировать" ведут на /book?eventTypeId=<id>', async () => {
+  it('"Book" buttons link to /book?eventTypeId=<id>', async () => {
     vi.mocked(eventTypesModule.eventTypesApi.list).mockResolvedValue(mockEventTypes);
 
     renderPage();
 
     await screen.findByTestId('event-types-list');
 
-    const links = screen.getAllByRole('link', { name: /забронировать/i });
+    const links = screen.getAllByRole('link', { name: /book/i });
     expect(links).toHaveLength(2);
     expect(links[0]).toHaveAttribute('href', '/book?eventTypeId=1');
     expect(links[1]).toHaveAttribute('href', '/book?eventTypeId=2');
   });
 
-  it('показывает пустое состояние, когда типов нет', async () => {
+  it('shows empty state when there are no event types', async () => {
     vi.mocked(eventTypesModule.eventTypesApi.list).mockResolvedValue([]);
 
     renderPage();
 
     const empty = await screen.findByTestId('empty-state');
     expect(empty).toBeInTheDocument();
-    expect(screen.getByText(/пока нет доступных форматов встреч/i)).toBeInTheDocument();
+    expect(screen.getByText(/no meeting formats available/i)).toBeInTheDocument();
   });
 });

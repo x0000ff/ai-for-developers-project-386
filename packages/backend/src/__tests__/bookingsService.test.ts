@@ -205,4 +205,40 @@ describe('bookingsService', () => {
     expect(list[0].startsAt).toBe(t2);
     expect(list[1].startsAt).toBe(t1);
   });
+
+  it('listPast returns only past bookings sorted by startsAt DESC', () => {
+    const et = eventTypesRepo.create({ name: 'Call', durationMinutes: 15 });
+    const beforeNow = '2025-06-01T09:00:00.000Z';
+    const earlierThanThat = '2025-06-01T08:00:00.000Z';
+
+    service.create(
+      { eventTypeId: et.id, startsAt: beforeNow, guestName: 'A', guestEmail: 'a@example.com' },
+      new Date('2025-06-01T07:00:00.000Z'),
+    );
+    service.create(
+      {
+        eventTypeId: et.id,
+        startsAt: earlierThanThat,
+        guestName: 'B',
+        guestEmail: 'b@example.com',
+      },
+      new Date('2025-06-01T07:00:00.000Z'),
+    );
+
+    const list = service.listPast(NOW);
+    expect(list).toHaveLength(2);
+    expect(list[0].startsAt).toBe(beforeNow);
+    expect(list[1].startsAt).toBe(earlierThanThat);
+  });
+
+  it('listPast returns empty when no past bookings exist', () => {
+    const et = eventTypesRepo.create({ name: 'Call', durationMinutes: 30 });
+    service.create(
+      { eventTypeId: et.id, startsAt: FUTURE, guestName: 'Alice', guestEmail: 'alice@example.com' },
+      NOW,
+    );
+
+    const list = service.listPast(NOW);
+    expect(list).toHaveLength(0);
+  });
 });

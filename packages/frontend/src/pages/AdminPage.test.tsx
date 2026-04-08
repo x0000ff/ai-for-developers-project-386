@@ -31,26 +31,26 @@ vi.mock('../api/bookings', async (importOriginal) => {
 });
 
 const mockEventTypes: EventType[] = [
-  { id: '1', name: 'Консультация', description: '', durationMinutes: 30 },
+  { id: '1', name: 'Consultation', description: '', durationMinutes: 30 },
 ];
 
 const mockBookings: Booking[] = [
   {
     id: 'b1',
     eventTypeId: '1',
-    eventTypeName: 'Консультация',
+    eventTypeName: 'Consultation',
     startsAt: '2026-04-10T10:00:00.000Z',
     endsAt: '2026-04-10T10:30:00.000Z',
-    guestName: 'Иван Иванов',
+    guestName: 'Ivan Ivanov',
     guestEmail: 'ivan@example.com',
   },
   {
     id: 'b2',
     eventTypeId: null,
-    eventTypeName: 'Удалённый тип',
+    eventTypeName: 'Deleted Type',
     startsAt: '2026-04-11T12:00:00.000Z',
     endsAt: '2026-04-11T13:00:00.000Z',
-    guestName: 'Мария Петрова',
+    guestName: 'Maria Petrova',
     guestEmail: 'maria@example.com',
   },
 ];
@@ -65,14 +65,14 @@ function renderPage() {
   );
 }
 
-describe('AdminPage — секция предстоящих встреч', () => {
+describe('AdminPage — upcoming meetings section', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    i18n.changeLanguage('ru');
+    i18n.changeLanguage('en');
     vi.mocked(eventTypesModule.eventTypesApi.list).mockResolvedValue(mockEventTypes);
   });
 
-  it('отображает таблицу бронирований с данными гостей', async () => {
+  it('displays bookings table with guest data', async () => {
     vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue(mockBookings);
 
     renderPage();
@@ -81,15 +81,15 @@ describe('AdminPage — секция предстоящих встреч', () =>
     expect(table).toBeInTheDocument();
 
     const t = within(table);
-    expect(t.getByText('Иван Иванов')).toBeInTheDocument();
+    expect(t.getByText('Ivan Ivanov')).toBeInTheDocument();
     expect(t.getByText('ivan@example.com')).toBeInTheDocument();
-    expect(t.getByText('Консультация')).toBeInTheDocument();
+    expect(t.getByText('Consultation')).toBeInTheDocument();
 
-    expect(t.getByText('Мария Петрова')).toBeInTheDocument();
+    expect(t.getByText('Maria Petrova')).toBeInTheDocument();
     expect(t.getByText('maria@example.com')).toBeInTheDocument();
   });
 
-  it('показывает пометку «Тип удалён» когда eventTypeId === null', async () => {
+  it('shows "Type deleted" badge when eventTypeId === null', async () => {
     vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue(mockBookings);
 
     renderPage();
@@ -98,50 +98,50 @@ describe('AdminPage — секция предстоящих встреч', () =>
 
     const badges = screen.getAllByTestId('deleted-type-badge');
     expect(badges).toHaveLength(1);
-    expect(badges[0]).toHaveTextContent('Тип удалён');
+    expect(badges[0]).toHaveTextContent('Type deleted');
   });
 
-  it('показывает пустое состояние, когда встреч нет', async () => {
+  it('shows empty state when there are no bookings', async () => {
     vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue([]);
 
     renderPage();
 
     const empty = await screen.findByTestId('bookings-empty');
     expect(empty).toBeInTheDocument();
-    expect(screen.getByText(/предстоящих встреч пока нет/i)).toBeInTheDocument();
+    expect(screen.getByText(/no upcoming bookings/i)).toBeInTheDocument();
   });
 
-  it('иконка удаления отображается в таблице бронирований', async () => {
+  it('delete icon is displayed in bookings table', async () => {
     vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue(mockBookings);
 
     renderPage();
 
     const table = await screen.findByTestId('bookings-table');
-    const deleteButtons = within(table).getAllByTitle('Удалить встречу');
+    const deleteButtons = within(table).getAllByTitle('Delete booking');
     expect(deleteButtons).toHaveLength(mockBookings.length);
   });
 
-  it('клик по иконке удаления открывает модальное окно подтверждения', async () => {
+  it('clicking delete icon opens confirmation modal', async () => {
     vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue(mockBookings);
 
     renderPage();
 
     const table = await screen.findByTestId('bookings-table');
-    const deleteButtons = within(table).getAllByTitle('Удалить встречу');
+    const deleteButtons = within(table).getAllByTitle('Delete booking');
     fireEvent.click(deleteButtons[0]);
 
-    expect(await screen.findByText('Удалить встречу')).toBeInTheDocument();
-    expect(screen.getByText(/вы уверены/i)).toBeInTheDocument();
+    expect(await screen.findByText('Delete booking')).toBeInTheDocument();
+    expect(screen.getByText(/are you sure/i)).toBeInTheDocument();
   });
 
-  it('подтверждение удаления вызывает deleteBooking и обновляет список', async () => {
+  it('confirming deletion calls deleteBooking and updates list', async () => {
     vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue(mockBookings);
     vi.mocked(bookingsModule.bookingsApi.deleteBooking).mockResolvedValue(undefined);
 
     renderPage();
 
     const table = await screen.findByTestId('bookings-table');
-    const deleteButtons = within(table).getAllByTitle('Удалить встречу');
+    const deleteButtons = within(table).getAllByTitle('Delete booking');
     fireEvent.click(deleteButtons[0]);
 
     const confirmBtn = await screen.findByTestId('delete-booking-confirm');
@@ -150,16 +150,16 @@ describe('AdminPage — секция предстоящих встреч', () =>
     expect(bookingsModule.bookingsApi.deleteBooking).toHaveBeenCalledWith(mockBookings[0].id);
   });
 
-  it('отмена в модальном окне не вызывает deleteBooking', async () => {
+  it('canceling in modal does not call deleteBooking', async () => {
     vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue(mockBookings);
 
     renderPage();
 
     const table = await screen.findByTestId('bookings-table');
-    const deleteButtons = within(table).getAllByTitle('Удалить встречу');
+    const deleteButtons = within(table).getAllByTitle('Delete booking');
     fireEvent.click(deleteButtons[0]);
 
-    const cancelBtn = await screen.findByRole('button', { name: 'Отмена' });
+    const cancelBtn = await screen.findByRole('button', { name: 'Cancel' });
     fireEvent.click(cancelBtn);
 
     expect(bookingsModule.bookingsApi.deleteBooking).not.toHaveBeenCalled();

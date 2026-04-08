@@ -1,4 +1,4 @@
-import { and, eq, gt, lt } from 'drizzle-orm';
+import { and, desc, eq, gt, lt } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import type { Db } from '../db/index.js';
 import { bookings, eventTypes } from '../db/schema.js';
@@ -101,6 +101,17 @@ export function makeBookingsService(db: Db) {
         .from(bookings)
         .where(gt(bookings.startsAt, nowMs))
         .orderBy(bookings.startsAt)
+        .all()
+        .map(toDto);
+    },
+
+    listPast(now: Date = new Date()): Booking[] {
+      const nowMs = now.getTime();
+      return db
+        .select()
+        .from(bookings)
+        .where(lt(bookings.startsAt, nowMs))
+        .orderBy(desc(bookings.startsAt))
         .all()
         .map(toDto);
     },

@@ -40,6 +40,10 @@ export async function bookingsRoutes(app: FastifyInstance, { db }: { db: Db }) {
     return service.listUpcoming();
   });
 
+  app.get('/bookings/past', async () => {
+    return service.listPast();
+  });
+
   app.delete<{ Params: { id: string } }>('/bookings/:id', async (req, reply) => {
     try {
       service.deleteById(req.params.id);
