@@ -1,3 +1,5 @@
+## ✅ Done
+
 # Step 1 — Event Types: contract, storage, CRUD API
 
 Владелец может через API полностью управлять типами встреч.
