@@ -14,5 +14,6 @@ export function createTestDb() {
   sqlite.pragma('foreign_keys = ON');
   const db = drizzle(sqlite, { schema });
   migrate(db, { migrationsFolder });
+  sqlite.exec('DELETE FROM event_types; DELETE FROM bookings;');
   return { db, sqlite };
 }
