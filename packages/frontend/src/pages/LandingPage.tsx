@@ -32,8 +32,32 @@ export function LandingPage() {
         }}
       >
         {/* Hero */}
+        <h1
+          style={{
+            fontFamily: 'var(--font)',
+            fontWeight: 700,
+            fontSize: 'clamp(2rem, 4vw + 1rem, 3.5rem)',
+            lineHeight: 1.08,
+            letterSpacing: '-0.04em',
+            color: 'var(--fg)',
+            marginTop: 20,
+            marginBottom: 8,
+            animation: 'fadeUp 0.45s ease both',
+            animationDelay: '0ms',
+          }}
+        >
+          Забронируйте звонок.
+          <br />
+          Без лишних шагов.
+        </h1>
+
         <div
-          style={{ animation: 'fadeUp 0.45s ease both', animationDelay: '0ms', marginBottom: 8 }}
+          style={{
+            animation: 'fadeUp 0.45s ease both',
+            animationDelay: '80ms',
+            marginTop: 80,
+            marginBottom: 16,
+          }}
         >
           <span
             style={{
@@ -55,25 +79,6 @@ export function LandingPage() {
             Выберите формат встречи
           </span>
         </div>
-
-        <h1
-          style={{
-            fontFamily: 'var(--font)',
-            fontWeight: 700,
-            fontSize: 'clamp(2rem, 4vw + 1rem, 3.5rem)',
-            lineHeight: 1.08,
-            letterSpacing: '-0.04em',
-            color: 'var(--fg)',
-            marginTop: 20,
-            marginBottom: 48,
-            animation: 'fadeUp 0.45s ease both',
-            animationDelay: '80ms',
-          }}
-        >
-          Забронируйте звонок.
-          <br />
-          Без лишних шагов.
-        </h1>
 
         {/* Content */}
         {loading && (
