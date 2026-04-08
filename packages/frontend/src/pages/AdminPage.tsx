@@ -52,25 +52,23 @@ function EventTypeForm({
     typeof form.durationMinutes === 'number' &&
     form.durationMinutes > 0;
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (isValid && !loading) {
+        onSubmit(form);
+      }
+    }
+  };
+
   return (
-    <Stack gap={12}>
+    <Stack gap={12} onKeyDown={handleKeyDown} tabIndex={0}>
       <TextInput
         label="Название"
         placeholder="Например: Консультация 30 мин"
         value={form.name}
         onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
         required
-        styles={{
-          label: { fontFamily: 'var(--font)', fontSize: 13, fontWeight: 500, color: 'var(--fg)' },
-          input: { fontFamily: 'var(--font)', borderColor: 'var(--border)' },
-        }}
-      />
-      <Textarea
-        label="Описание"
-        placeholder="Краткое описание встречи"
-        value={form.description}
-        onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-        rows={3}
         styles={{
           label: { fontFamily: 'var(--font)', fontSize: 13, fontWeight: 500, color: 'var(--fg)' },
           input: { fontFamily: 'var(--font)', borderColor: 'var(--border)' },
@@ -84,6 +82,17 @@ function EventTypeForm({
         min={5}
         step={5}
         required
+        styles={{
+          label: { fontFamily: 'var(--font)', fontSize: 13, fontWeight: 500, color: 'var(--fg)' },
+          input: { fontFamily: 'var(--font)', borderColor: 'var(--border)' },
+        }}
+      />
+      <Textarea
+        label="Описание"
+        placeholder="Краткое описание встречи"
+        value={form.description}
+        onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+        rows={3}
         styles={{
           label: { fontFamily: 'var(--font)', fontSize: 13, fontWeight: 500, color: 'var(--fg)' },
           input: { fontFamily: 'var(--font)', borderColor: 'var(--border)' },
@@ -388,8 +397,8 @@ export function AdminPage() {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>Название</Table.Th>
-                  <Table.Th>Описание</Table.Th>
                   <Table.Th style={{ width: 140 }}>Длительность</Table.Th>
+                  <Table.Th>Описание</Table.Th>
                   <Table.Th style={{ width: 100 }}></Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -398,11 +407,6 @@ export function AdminPage() {
                   <Table.Tr key={et.id}>
                     <Table.Td>
                       <span style={{ fontWeight: 500 }}>{et.name}</span>
-                    </Table.Td>
-                    <Table.Td>
-                      <span style={{ color: 'var(--fg-muted)' }}>
-                        {et.description || <em style={{ opacity: 0.5 }}>—</em>}
-                      </span>
                     </Table.Td>
                     <Table.Td>
                       <span
@@ -418,6 +422,11 @@ export function AdminPage() {
                         }}
                       >
                         {et.durationMinutes} мин
+                      </span>
+                    </Table.Td>
+                    <Table.Td>
+                      <span style={{ color: 'var(--fg-muted)' }}>
+                        {et.description || <em style={{ opacity: 0.5 }}>—</em>}
                       </span>
                     </Table.Td>
                     <Table.Td>

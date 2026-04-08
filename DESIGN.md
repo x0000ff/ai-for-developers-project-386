@@ -2,7 +2,7 @@
 
 Design system reference for the Callbook frontend.
 
-## Color Palette (CSS variables in `landing.css`)
+## Color Palette (CSS variables in `global.css`)
 
 | Variable         | Value                       | Usage                           |
 | ---------------- | --------------------------- | ------------------------------- |
