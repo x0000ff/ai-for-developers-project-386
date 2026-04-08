@@ -73,5 +73,6 @@ packages/api/generated/
 packages/backend/dist/
 packages/frontend/dist/
 
-# Database
-packages/backend/*.db
+# SQLite WAL/SHM files
+packages/app.db-wal
+packages/app.db-shm
