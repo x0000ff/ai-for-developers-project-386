@@ -8,9 +8,7 @@ name: hexlet-check
 on:
   push:
     branches:
-      - '**'
-    tags:
-      - '**'
+      - 'main'
 
 jobs:
   build:
