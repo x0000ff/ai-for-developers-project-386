@@ -37,6 +37,7 @@ docker run -p 3000:3000 book-a-call  # → http://localhost:3000
 pnpm install                  # установка зависимостей
 pnpm dev                      # запуск всех пакетов параллельно (dev mode)
 pnpm build                    # production сборка (api → frontend)
+pnpm test                     # запуск тестов
 pnpm typecheck                # TypeScript проверка всех пакетов
 pnpm lint                     # ESLint
 pnpm format                   # Prettier

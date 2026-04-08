@@ -1,14 +1,23 @@
-import { Clock, Phone, ShieldCheck, Users, Zap } from 'lucide-react';
+import { Clock, Calendar, Zap } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import type { EventType } from '@app/api';
+import { eventTypesApi } from '../api/eventTypes';
 import { Navbar } from '../components/Navbar';
 
-const features = [
-  { icon: Clock, text: 'No back-and-forth' },
-  { icon: Users, text: 'Works for teams' },
-  { icon: ShieldCheck, text: 'Simple & secure' },
-];
-
 export function LandingPage() {
+  const [eventTypes, setEventTypes] = useState<EventType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    eventTypesApi
+      .list()
+      .then(setEventTypes)
+      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка загрузки'))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div style={{ minHeight: '100vh' }}>
       <Navbar />
@@ -18,16 +27,14 @@ export function LandingPage() {
           maxWidth: 1200,
           margin: '0 auto',
           padding: '0 24px',
-          minHeight: 'calc(100vh - 64px)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          paddingTop: 80,
+          paddingTop: 64,
           paddingBottom: 96,
         }}
       >
-        {/* Badge */}
-        <div style={{ animation: 'fadeUp 0.45s ease both', animationDelay: '0ms' }}>
+        {/* Hero */}
+        <div
+          style={{ animation: 'fadeUp 0.45s ease both', animationDelay: '0ms', marginBottom: 8 }}
+        >
           <span
             style={{
               display: 'inline-flex',
@@ -45,91 +52,244 @@ export function LandingPage() {
             }}
           >
             <Zap size={11} strokeWidth={2.5} />
-            Zero friction scheduling
+            Выберите формат встречи
           </span>
         </div>
 
-        {/* H1 */}
         <h1
           style={{
             fontFamily: 'var(--font)',
             fontWeight: 700,
-            fontSize: 'clamp(3rem, 5vw + 1.5rem, 5.5rem)',
-            lineHeight: 1.06,
+            fontSize: 'clamp(2rem, 4vw + 1rem, 3.5rem)',
+            lineHeight: 1.08,
             letterSpacing: '-0.04em',
             color: 'var(--fg)',
-            marginTop: 28,
+            marginTop: 20,
+            marginBottom: 48,
             animation: 'fadeUp 0.45s ease both',
             animationDelay: '80ms',
           }}
         >
-          Book calls.
+          Забронируйте звонок.
           <br />
-          Effortlessly.
+          Без лишних шагов.
         </h1>
 
-        {/* CTA */}
-        <div
-          id="book"
-          style={{
-            marginTop: 40,
-            animation: 'fadeUp 0.45s ease both',
-            animationDelay: '240ms',
-          }}
-        >
-          <Link
-            to="/book"
-            className="cta-btn"
+        {/* Content */}
+        {loading && (
+          <div
             style={{
-              display: 'inline-flex',
+              display: 'flex',
+              justifyContent: 'center',
               alignItems: 'center',
-              gap: 10,
-              padding: '14px 28px',
-              background: 'var(--accent)',
-              color: 'var(--accent-fg)',
-              border: 'none',
-              borderRadius: 8,
-              fontFamily: 'var(--font)',
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: 'pointer',
-              textDecoration: 'none',
-              letterSpacing: '-0.02em',
+              minHeight: 200,
+              animation: 'fadeUp 0.45s ease both',
+              animationDelay: '160ms',
             }}
           >
-            <Phone size={16} strokeWidth={2} />
-            Book your call
-          </Link>
-        </div>
-
-        {/* Feature row */}
-        <div
-          className="feature-row"
-          style={{
-            marginTop: 64,
-            animation: 'fadeUp 0.45s ease both',
-            animationDelay: '320ms',
-          }}
-        >
-          {features.map(({ icon: Icon, text }) => (
             <div
-              key={text}
               style={{
-                display: 'flex',
+                width: 32,
+                height: 32,
+                border: '3px solid var(--border)',
+                borderTopColor: 'var(--accent)',
+                borderRadius: '50%',
+                animation: 'spin 0.75s linear infinite',
+              }}
+            />
+          </div>
+        )}
+
+        {!loading && error && (
+          <div
+            style={{
+              padding: '16px 20px',
+              background: '#fef2f2',
+              border: '1px solid #fecaca',
+              borderRadius: 10,
+              fontFamily: 'var(--font)',
+              fontSize: 14,
+              color: '#dc2626',
+              animation: 'fadeUp 0.45s ease both',
+              animationDelay: '160ms',
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && eventTypes.length === 0 && (
+          <div
+            data-testid="empty-state"
+            style={{
+              textAlign: 'center',
+              padding: '80px 24px',
+              border: '1px dashed var(--border)',
+              borderRadius: 16,
+              animation: 'fadeUp 0.45s ease both',
+              animationDelay: '160ms',
+              maxWidth: 760,
+              margin: '0 auto',
+            }}
+          >
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                background: 'var(--accent)',
+                borderRadius: 16,
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: 8,
-                color: 'var(--fg-muted)',
-                fontFamily: 'var(--font)',
-                fontSize: 14,
-                fontWeight: 400,
+                justifyContent: 'center',
+                marginBottom: 20,
               }}
             >
-              <Icon size={15} strokeWidth={1.75} color="var(--fg-muted)" />
-              {text}
+              <Calendar size={28} color="white" strokeWidth={1.75} />
             </div>
-          ))}
-        </div>
+            <p
+              style={{
+                fontFamily: 'var(--font)',
+                fontSize: 17,
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                color: 'var(--fg)',
+                margin: 0,
+                marginBottom: 8,
+              }}
+            >
+              Пока нет доступных форматов встреч
+            </p>
+            <p
+              style={{
+                fontFamily: 'var(--font)',
+                fontSize: 14,
+                color: 'var(--fg-muted)',
+                margin: 0,
+              }}
+            >
+              Загляните позже — скоро здесь появятся варианты для бронирования.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && eventTypes.length > 0 && (
+          <div
+            data-testid="event-types-list"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: 20,
+              animation: 'fadeUp 0.45s ease both',
+              animationDelay: '160ms',
+            }}
+          >
+            {eventTypes.map((et) => (
+              <EventTypeCard key={et.id} eventType={et} />
+            ))}
+          </div>
+        )}
       </main>
+    </div>
+  );
+}
+
+function EventTypeCard({ eventType }: { eventType: EventType }) {
+  return (
+    <div
+      style={{
+        background: 'white',
+        border: '1px solid var(--border)',
+        borderRadius: 14,
+        padding: '24px 24px 20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        transition: 'box-shadow 0.15s ease, transform 0.15s ease',
+      }}
+      className="event-card"
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 12,
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: 'var(--font)',
+            fontWeight: 700,
+            fontSize: 18,
+            letterSpacing: '-0.03em',
+            color: 'var(--fg)',
+            margin: 0,
+            lineHeight: 1.3,
+          }}
+        >
+          {eventType.name}
+        </h2>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            flexShrink: 0,
+            border: '1px solid var(--border)',
+            borderRadius: 6,
+            padding: '4px 10px',
+            fontSize: 12,
+            fontWeight: 600,
+            fontFamily: 'var(--font)',
+            color: 'var(--fg-muted)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <Clock size={11} strokeWidth={2} />
+          {eventType.durationMinutes} мин
+        </span>
+      </div>
+
+      {eventType.description && (
+        <p
+          style={{
+            fontFamily: 'var(--font)',
+            fontSize: 14,
+            color: 'var(--fg-muted)',
+            margin: 0,
+            lineHeight: 1.5,
+            flexGrow: 1,
+          }}
+        >
+          {eventType.description}
+        </p>
+      )}
+
+      <Link
+        to={`/book?eventTypeId=${eventType.id}`}
+        className="cta-btn"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          marginTop: 'auto',
+          padding: '11px 20px',
+          background: 'var(--accent)',
+          color: 'var(--accent-fg)',
+          border: 'none',
+          borderRadius: 8,
+          fontFamily: 'var(--font)',
+          fontWeight: 600,
+          fontSize: 14,
+          letterSpacing: '-0.01em',
+          cursor: 'pointer',
+          textDecoration: 'none',
+        }}
+      >
+        <Calendar size={15} strokeWidth={2} />
+        Забронировать
+      </Link>
     </div>
   );
 }

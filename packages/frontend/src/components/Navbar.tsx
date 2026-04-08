@@ -1,7 +1,9 @@
 import { CalendarDays, ShieldCheck } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export function Navbar() {
+  const location = useLocation();
+  const isAdminPage = location.pathname === '/admin';
   return (
     <nav
       style={{
@@ -53,34 +55,36 @@ export function Navbar() {
               letterSpacing: '-0.02em',
             }}
           >
-            Callbook
+            Созвончик 🤙
           </span>
         </Link>
 
         {/* Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-<Link
-            to="/admin"
-            className="nav-btn-outline"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 7,
-              padding: '8px 16px',
-              border: '1px solid var(--border)',
-              borderRadius: 8,
-              background: 'transparent',
-              color: 'var(--fg)',
-              fontFamily: 'var(--font)',
-              fontWeight: 500,
-              fontSize: 14,
-              textDecoration: 'none',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            <ShieldCheck size={14} strokeWidth={2} />
-            Admin
-          </Link>
+          {!isAdminPage && (
+            <Link
+              to="/admin"
+              className="nav-btn-outline"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 7,
+                padding: '8px 16px',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                background: 'transparent',
+                color: 'var(--fg)',
+                fontFamily: 'var(--font)',
+                fontWeight: 500,
+                fontSize: 14,
+                textDecoration: 'none',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              <ShieldCheck size={14} strokeWidth={2} />
+              Админка
+            </Link>
+          )}
         </div>
       </div>
     </nav>
