@@ -27,8 +27,8 @@ vi.mock('../api/bookings', async (importOriginal) => {
 });
 
 const mockEventTypes: EventType[] = [
-  { id: '1', name: 'Консультация', description: 'Короткая встреча', durationMinutes: 30 },
-  { id: '2', name: 'Стратегическая сессия', description: '', durationMinutes: 60 },
+  { id: '1', name: 'Consultation', description: 'Short meeting', durationMinutes: 30 },
+  { id: '2', name: 'Strategic session', description: '', durationMinutes: 60 },
 ];
 
 const mockSlots: Slot[] = [
@@ -39,10 +39,10 @@ const mockSlots: Slot[] = [
 const mockBooking: Booking = {
   id: 'b1',
   eventTypeId: '1',
-  eventTypeName: 'Консультация',
+  eventTypeName: 'Consultation',
   startsAt: '2026-04-10T10:00:00.000Z',
   endsAt: '2026-04-10T10:30:00.000Z',
-  guestName: 'Иван Иванов',
+  guestName: 'Ivan Ivanov',
   guestEmail: 'ivan@example.com',
 };
 
@@ -69,7 +69,7 @@ function getCalendarDay(day: number) {
 describe('BookCallPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    i18n.changeLanguage('ru');
+    i18n.changeLanguage('en');
     vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date('2026-04-08T12:00:00.000Z') });
     vi.mocked(eventTypesModule.eventTypesApi.list).mockResolvedValue(mockEventTypes);
   });
@@ -78,7 +78,7 @@ describe('BookCallPage', () => {
     vi.useRealTimers();
   });
 
-  it('отображает сетку слотов после выбора даты', async () => {
+  it('displays slot grid after selecting a date', async () => {
     vi.mocked(bookingsModule.bookingsApi.getSlots).mockResolvedValue(mockSlots);
 
     renderPage();
@@ -96,7 +96,7 @@ describe('BookCallPage', () => {
     expect(bookingsModule.bookingsApi.getSlots).toHaveBeenCalledWith('1', '2026-04-10');
   });
 
-  it('показывает пустое состояние, если слотов нет', async () => {
+  it('shows empty state when there are no slots', async () => {
     vi.mocked(bookingsModule.bookingsApi.getSlots).mockResolvedValue([]);
 
     renderPage();
@@ -105,11 +105,11 @@ describe('BookCallPage', () => {
     fireEvent.click(getCalendarDay(10));
 
     await waitFor(() => {
-      expect(screen.getByText(/нет доступных слотов/i)).toBeInTheDocument();
+      expect(screen.getByText(/no available slots for this date/i)).toBeInTheDocument();
     });
   });
 
-  it('сабмит формы — 201 → показывает экран подтверждения', async () => {
+  it('form submission — 201 → shows confirmation screen', async () => {
     vi.mocked(bookingsModule.bookingsApi.getSlots).mockResolvedValue(mockSlots);
     vi.mocked(bookingsModule.bookingsApi.createBooking).mockResolvedValue(mockBooking);
 
@@ -122,7 +122,7 @@ describe('BookCallPage', () => {
     fireEvent.click(screen.getByTestId('slot-2026-04-10T10:00:00.000Z'));
 
     fireEvent.change(screen.getByTestId('guest-name-input'), {
-      target: { value: 'Иван Иванов' },
+      target: { value: 'Ivan Ivanov' },
     });
     fireEvent.change(screen.getByTestId('guest-email-input'), {
       target: { value: 'ivan@example.com' },
@@ -132,12 +132,12 @@ describe('BookCallPage', () => {
 
     const confirmation = await screen.findByTestId('booking-confirmation');
     expect(confirmation).toBeInTheDocument();
-    expect(screen.getByText('Звонок забронирован!')).toBeInTheDocument();
-    expect(screen.getByText('Иван Иванов')).toBeInTheDocument();
+    expect(screen.getByText('Call booked!')).toBeInTheDocument();
+    expect(screen.getByText('Ivan Ivanov')).toBeInTheDocument();
     expect(screen.getByText('ivan@example.com')).toBeInTheDocument();
   });
 
-  it('сабмит формы — 409 → показывает сообщение о конфликте и перезапрашивает слоты', async () => {
+  it('form submission — 409 → shows conflict error and refetches slots', async () => {
     const { ApiError } = await import('../api/bookings');
     vi.mocked(bookingsModule.bookingsApi.getSlots).mockResolvedValue(mockSlots);
     vi.mocked(bookingsModule.bookingsApi.createBooking).mockRejectedValue(
@@ -153,7 +153,7 @@ describe('BookCallPage', () => {
     fireEvent.click(screen.getByTestId('slot-2026-04-10T10:00:00.000Z'));
 
     fireEvent.change(screen.getByTestId('guest-name-input'), {
-      target: { value: 'Иван Иванов' },
+      target: { value: 'Ivan Ivanov' },
     });
     fireEvent.change(screen.getByTestId('guest-email-input'), {
       target: { value: 'ivan@example.com' },
@@ -162,7 +162,7 @@ describe('BookCallPage', () => {
     fireEvent.click(screen.getByTestId('submit-button'));
 
     await screen.findByTestId('conflict-error');
-    expect(screen.getByText(/слот только что заняли/i)).toBeInTheDocument();
+    expect(screen.getByText(/this slot was just taken/i)).toBeInTheDocument();
 
     expect(bookingsModule.bookingsApi.getSlots).toHaveBeenCalledTimes(2);
   });

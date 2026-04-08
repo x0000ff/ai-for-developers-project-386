@@ -189,4 +189,11 @@ describe('Bookings routes', () => {
     expect(list).toHaveLength(1);
     expect(list[0].id).toBe(created.id);
   });
+
+  it('GET /api/bookings/past returns empty list when no past bookings', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/bookings/past' });
+    expect(res.statusCode).toBe(200);
+    const list = res.json();
+    expect(list).toHaveLength(0);
+  });
 });

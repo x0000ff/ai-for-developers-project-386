@@ -5,6 +5,7 @@ import {
   Loader,
   Modal,
   NumberInput,
+  SegmentedControl,
   Stack,
   Tabs,
   Text,
@@ -171,6 +172,10 @@ export function AdminPage() {
   const [bookingsLoading, setBookingsLoading] = useState(true);
   const [bookingsError, setBookingsError] = useState<string | null>(null);
 
+  const [pastBookings, setPastBookings] = useState<Booking[]>([]);
+  const [pastBookingsLoading, setPastBookingsLoading] = useState(true);
+  const [pastBookingsError, setPastBookingsError] = useState<string | null>(null);
+
   const [createOpen, setCreateOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -186,10 +191,12 @@ export function AdminPage() {
   const [deletingBookingId, setDeletingBookingId] = useState<string | null>(null);
   const [deleteBookingModalOpen, setDeleteBookingModalOpen] = useState(false);
   const [deleteBookingLoading, setDeleteBookingLoading] = useState(false);
+  const [bookingsFilter, setBookingsFilter] = useState<'upcoming' | 'past'>('upcoming');
 
   useEffect(() => {
     loadEventTypes();
     loadBookings();
+    loadPastBookings();
   }, []);
 
   async function loadBookings() {
@@ -202,6 +209,19 @@ export function AdminPage() {
       setBookingsError(err instanceof Error ? err.message : t('admin.errorLoading'));
     } finally {
       setBookingsLoading(false);
+    }
+  }
+
+  async function loadPastBookings() {
+    setPastBookingsLoading(true);
+    setPastBookingsError(null);
+    try {
+      const data = await bookingsApi.listPast();
+      setPastBookings(data);
+    } catch (err) {
+      setPastBookingsError(err instanceof Error ? err.message : t('admin.errorLoading'));
+    } finally {
+      setPastBookingsLoading(false);
     }
   }
 
@@ -263,6 +283,7 @@ export function AdminPage() {
       setDeleteBookingModalOpen(false);
       setDeletingBookingId(null);
       await loadBookings();
+      await loadPastBookings();
     } finally {
       setDeleteBookingLoading(false);
     }
@@ -510,13 +531,40 @@ export function AdminPage() {
             <div
               style={{
                 display: 'flex',
-                justifyContent: 'flex-end',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 marginBottom: 20,
+                flexWrap: 'wrap',
+                gap: 12,
               }}
             >
+              <SegmentedControl
+                value={bookingsFilter}
+                onChange={(value) => setBookingsFilter(value as 'upcoming' | 'past')}
+                data={[
+                  { label: t('admin.bookingsFilterUpcoming'), value: 'upcoming' },
+                  { label: t('admin.bookingsFilterPast'), value: 'past' },
+                ]}
+                styles={{
+                  root: { background: 'white', border: '1px solid var(--border)' },
+                  indicator: { background: 'var(--accent)', borderRadius: 6 },
+                  label: {
+                    fontFamily: 'var(--font)',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: 'var(--fg)',
+                  },
+                }}
+              />
               <button
-                onClick={loadBookings}
-                disabled={bookingsLoading}
+                onClick={() => {
+                  if (bookingsFilter === 'upcoming') {
+                    loadBookings();
+                  } else {
+                    loadPastBookings();
+                  }
+                }}
+                disabled={bookingsFilter === 'upcoming' ? bookingsLoading : pastBookingsLoading}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -529,8 +577,12 @@ export function AdminPage() {
                   fontFamily: 'var(--font)',
                   fontWeight: 500,
                   fontSize: 13,
-                  cursor: bookingsLoading ? 'not-allowed' : 'pointer',
-                  opacity: bookingsLoading ? 0.6 : 1,
+                  cursor: (bookingsFilter === 'upcoming' ? bookingsLoading : pastBookingsLoading)
+                    ? 'not-allowed'
+                    : 'pointer',
+                  opacity: (bookingsFilter === 'upcoming' ? bookingsLoading : pastBookingsLoading)
+                    ? 0.6
+                    : 1,
                 }}
               >
                 <RefreshCw size={14} strokeWidth={2} />
@@ -538,7 +590,7 @@ export function AdminPage() {
               </button>
             </div>
 
-            {bookingsLoading && (
+            {bookingsFilter === 'upcoming' && bookingsLoading && (
               <div
                 style={{
                   display: 'flex',
@@ -551,7 +603,20 @@ export function AdminPage() {
               </div>
             )}
 
-            {!bookingsLoading && bookingsError && (
+            {bookingsFilter === 'past' && pastBookingsLoading && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: 120,
+                }}
+              >
+                <Loader size="md" color="var(--accent)" />
+              </div>
+            )}
+
+            {bookingsFilter === 'upcoming' && !bookingsLoading && bookingsError && (
               <div
                 style={{
                   padding: '16px 20px',
@@ -567,147 +632,317 @@ export function AdminPage() {
               </div>
             )}
 
-            {!bookingsLoading && !bookingsError && bookings.length === 0 && (
+            {bookingsFilter === 'past' && !pastBookingsLoading && pastBookingsError && (
               <div
-                data-testid="bookings-empty"
                 style={{
-                  textAlign: 'center',
-                  padding: '48px 24px',
-                  border: '1px dashed var(--border)',
-                  borderRadius: 12,
+                  padding: '16px 20px',
+                  background: '#fef2f2',
+                  border: '1px solid #fecaca',
+                  borderRadius: 10,
+                  fontFamily: 'var(--font)',
+                  fontSize: 14,
+                  color: '#dc2626',
                 }}
               >
-                <p
-                  style={{
-                    fontFamily: 'var(--font)',
-                    fontSize: 15,
-                    color: 'var(--fg-muted)',
-                    margin: 0,
-                  }}
-                >
-                  {t('admin.emptyBookings')}
-                </p>
+                {pastBookingsError}
               </div>
             )}
 
-            {!bookingsLoading && !bookingsError && bookings.length > 0 && (
-              <div
-                data-testid="bookings-table"
-                style={{
-                  border: '1px solid var(--border)',
-                  borderRadius: 12,
-                  overflow: 'auto',
-                  background: 'white',
-                }}
-              >
-                <Table
-                  highlightOnHover
-                  styles={{
-                    thead: { background: '#faf9f7' },
-                    th: {
-                      fontFamily: 'var(--font)',
-                      fontSize: 12,
-                      fontWeight: 600,
-                      letterSpacing: '0.05em',
-                      textTransform: 'uppercase',
-                      color: 'var(--fg-muted)',
-                      padding: '12px 16px',
-                    },
-                    td: {
-                      fontFamily: 'var(--font)',
-                      fontSize: 14,
-                      color: 'var(--fg)',
-                      padding: '14px 16px',
-                      verticalAlign: 'middle',
-                    },
+            {bookingsFilter === 'upcoming' &&
+              !bookingsLoading &&
+              !bookingsError &&
+              bookings.length === 0 && (
+                <div
+                  data-testid="bookings-empty"
+                  style={{
+                    textAlign: 'center',
+                    padding: '48px 24px',
+                    border: '1px dashed var(--border)',
+                    borderRadius: 12,
                   }}
                 >
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>{t('admin.colDate')}</Table.Th>
-                      <Table.Th>{t('admin.colTime')}</Table.Th>
-                      <Table.Th>{t('admin.colMeetingType')}</Table.Th>
-                      <Table.Th>{t('admin.colGuest')}</Table.Th>
-                      <Table.Th>{t('admin.colEmail')}</Table.Th>
-                      <Table.Th style={{ width: 60 }}></Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {bookings.map((b) => (
-                      <Table.Tr key={b.id}>
-                        <Table.Td>
-                          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {formatDate(b.startsAt, locale)}
-                          </span>
-                        </Table.Td>
-                        <Table.Td>
-                          <span
-                            style={{
-                              fontVariantNumeric: 'tabular-nums',
-                              color: 'var(--fg-muted)',
-                            }}
-                          >
-                            {formatTime(b.startsAt, locale)} – {formatTime(b.endsAt, locale)}
-                          </span>
-                        </Table.Td>
-                        <Table.Td>
-                          {b.eventTypeId === null ? (
+                  <p
+                    style={{
+                      fontFamily: 'var(--font)',
+                      fontSize: 15,
+                      color: 'var(--fg-muted)',
+                      margin: 0,
+                    }}
+                  >
+                    {t('admin.emptyUpcomingBookings')}
+                  </p>
+                </div>
+              )}
+
+            {bookingsFilter === 'past' &&
+              !pastBookingsLoading &&
+              !pastBookingsError &&
+              pastBookings.length === 0 && (
+                <div
+                  data-testid="past-bookings-empty"
+                  style={{
+                    textAlign: 'center',
+                    padding: '48px 24px',
+                    border: '1px dashed var(--border)',
+                    borderRadius: 12,
+                  }}
+                >
+                  <p
+                    style={{
+                      fontFamily: 'var(--font)',
+                      fontSize: 15,
+                      color: 'var(--fg-muted)',
+                      margin: 0,
+                    }}
+                  >
+                    {t('admin.emptyPastBookings')}
+                  </p>
+                </div>
+              )}
+
+            {bookingsFilter === 'upcoming' &&
+              !bookingsLoading &&
+              !bookingsError &&
+              bookings.length > 0 && (
+                <div
+                  data-testid="bookings-table"
+                  style={{
+                    border: '1px solid var(--border)',
+                    borderRadius: 12,
+                    overflow: 'auto',
+                    background: 'white',
+                  }}
+                >
+                  <Table
+                    highlightOnHover
+                    styles={{
+                      thead: { background: '#faf9f7' },
+                      th: {
+                        fontFamily: 'var(--font)',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        color: 'var(--fg-muted)',
+                        padding: '12px 16px',
+                      },
+                      td: {
+                        fontFamily: 'var(--font)',
+                        fontSize: 14,
+                        color: 'var(--fg)',
+                        padding: '14px 16px',
+                        verticalAlign: 'middle',
+                      },
+                    }}
+                  >
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th>{t('admin.colDate')}</Table.Th>
+                        <Table.Th>{t('admin.colTime')}</Table.Th>
+                        <Table.Th>{t('admin.colMeetingType')}</Table.Th>
+                        <Table.Th>{t('admin.colGuest')}</Table.Th>
+                        <Table.Th>{t('admin.colEmail')}</Table.Th>
+                        <Table.Th style={{ width: 60 }}></Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {bookings.map((b) => (
+                        <Table.Tr key={b.id}>
+                          <Table.Td>
+                            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                              {formatDate(b.startsAt, locale)}
+                            </span>
+                          </Table.Td>
+                          <Table.Td>
                             <span
-                              data-testid="deleted-type-badge"
                               style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                padding: '3px 8px',
-                                background: 'var(--bg)',
-                                border: '1px solid var(--border)',
-                                borderRadius: 6,
-                                fontSize: 12,
-                                fontWeight: 500,
+                                fontVariantNumeric: 'tabular-nums',
                                 color: 'var(--fg-muted)',
-                                fontStyle: 'italic',
                               }}
                             >
-                              {t('admin.deletedTypeBadge')}
+                              {formatTime(b.startsAt, locale)} – {formatTime(b.endsAt, locale)}
                             </span>
-                          ) : (
-                            <span style={{ fontWeight: 500 }}>
-                              <span style={{ color: 'var(--fg-muted)', fontWeight: 400 }}>
-                                {t('admin.minutesSuffix', {
-                                  count: Math.round(
-                                    (new Date(b.endsAt).getTime() -
-                                      new Date(b.startsAt).getTime()) /
-                                      60000,
-                                  ),
-                                })}
+                          </Table.Td>
+                          <Table.Td>
+                            {b.eventTypeId === null ? (
+                              <span
+                                data-testid="deleted-type-badge"
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  padding: '3px 8px',
+                                  background: 'var(--bg)',
+                                  border: '1px solid var(--border)',
+                                  borderRadius: 6,
+                                  fontSize: 12,
+                                  fontWeight: 500,
+                                  color: 'var(--fg-muted)',
+                                  fontStyle: 'italic',
+                                }}
+                              >
+                                {t('admin.deletedTypeBadge')}
                               </span>
-                              {' • '}
-                              <span>{b.eventTypeName}</span>
-                            </span>
-                          )}
-                        </Table.Td>
-                        <Table.Td>{b.guestName}</Table.Td>
-                        <Table.Td>
-                          <span style={{ color: 'var(--fg-muted)' }}>{b.guestEmail}</span>
-                        </Table.Td>
-                        <Table.Td>
-                          <ActionIcon
-                            variant="subtle"
-                            color="red"
-                            title={t('admin.tooltipDeleteMeeting')}
-                            onClick={() => {
-                              setDeletingBookingId(b.id);
-                              setDeleteBookingModalOpen(true);
-                            }}
-                          >
-                            <Trash2 size={15} strokeWidth={2} />
-                          </ActionIcon>
-                        </Table.Td>
+                            ) : (
+                              <span style={{ fontWeight: 500 }}>
+                                <span style={{ color: 'var(--fg-muted)', fontWeight: 400 }}>
+                                  {t('admin.minutesSuffix', {
+                                    count: Math.round(
+                                      (new Date(b.endsAt).getTime() -
+                                        new Date(b.startsAt).getTime()) /
+                                        60000,
+                                    ),
+                                  })}
+                                </span>
+                                {' • '}
+                                <span>{b.eventTypeName}</span>
+                              </span>
+                            )}
+                          </Table.Td>
+                          <Table.Td>{b.guestName}</Table.Td>
+                          <Table.Td>
+                            <span style={{ color: 'var(--fg-muted)' }}>{b.guestEmail}</span>
+                          </Table.Td>
+                          <Table.Td>
+                            <ActionIcon
+                              variant="subtle"
+                              color="red"
+                              title={t('admin.tooltipDeleteMeeting')}
+                              onClick={() => {
+                                setDeletingBookingId(b.id);
+                                setDeleteBookingModalOpen(true);
+                              }}
+                            >
+                              <Trash2 size={15} strokeWidth={2} />
+                            </ActionIcon>
+                          </Table.Td>
+                        </Table.Tr>
+                      ))}
+                    </Table.Tbody>
+                  </Table>
+                </div>
+              )}
+
+            {bookingsFilter === 'past' &&
+              !pastBookingsLoading &&
+              !pastBookingsError &&
+              pastBookings.length > 0 && (
+                <div
+                  data-testid="past-bookings-table"
+                  style={{
+                    border: '1px solid var(--border)',
+                    borderRadius: 12,
+                    overflow: 'auto',
+                    background: 'white',
+                  }}
+                >
+                  <Table
+                    highlightOnHover
+                    styles={{
+                      thead: { background: '#faf9f7' },
+                      th: {
+                        fontFamily: 'var(--font)',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        color: 'var(--fg-muted)',
+                        padding: '12px 16px',
+                      },
+                      td: {
+                        fontFamily: 'var(--font)',
+                        fontSize: 14,
+                        color: 'var(--fg)',
+                        padding: '14px 16px',
+                        verticalAlign: 'middle',
+                      },
+                    }}
+                  >
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th>{t('admin.colDate')}</Table.Th>
+                        <Table.Th>{t('admin.colTime')}</Table.Th>
+                        <Table.Th>{t('admin.colMeetingType')}</Table.Th>
+                        <Table.Th>{t('admin.colGuest')}</Table.Th>
+                        <Table.Th>{t('admin.colEmail')}</Table.Th>
+                        <Table.Th style={{ width: 60 }}></Table.Th>
                       </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
-              </div>
-            )}
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {pastBookings.map((b) => (
+                        <Table.Tr key={b.id}>
+                          <Table.Td>
+                            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                              {formatDate(b.startsAt, locale)}
+                            </span>
+                          </Table.Td>
+                          <Table.Td>
+                            <span
+                              style={{
+                                fontVariantNumeric: 'tabular-nums',
+                                color: 'var(--fg-muted)',
+                              }}
+                            >
+                              {formatTime(b.startsAt, locale)} – {formatTime(b.endsAt, locale)}
+                            </span>
+                          </Table.Td>
+                          <Table.Td>
+                            {b.eventTypeId === null ? (
+                              <span
+                                data-testid="deleted-type-badge"
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  padding: '3px 8px',
+                                  background: 'var(--bg)',
+                                  border: '1px solid var(--border)',
+                                  borderRadius: 6,
+                                  fontSize: 12,
+                                  fontWeight: 500,
+                                  color: 'var(--fg-muted)',
+                                  fontStyle: 'italic',
+                                }}
+                              >
+                                {t('admin.deletedTypeBadge')}
+                              </span>
+                            ) : (
+                              <span style={{ fontWeight: 500 }}>
+                                <span style={{ color: 'var(--fg-muted)', fontWeight: 400 }}>
+                                  {t('admin.minutesSuffix', {
+                                    count: Math.round(
+                                      (new Date(b.endsAt).getTime() -
+                                        new Date(b.startsAt).getTime()) /
+                                        60000,
+                                    ),
+                                  })}
+                                </span>
+                                {' • '}
+                                <span>{b.eventTypeName}</span>
+                              </span>
+                            )}
+                          </Table.Td>
+                          <Table.Td>{b.guestName}</Table.Td>
+                          <Table.Td>
+                            <span style={{ color: 'var(--fg-muted)' }}>{b.guestEmail}</span>
+                          </Table.Td>
+                          <Table.Td>
+                            <ActionIcon
+                              variant="subtle"
+                              color="red"
+                              title={t('admin.tooltipDeleteMeeting')}
+                              onClick={() => {
+                                setDeletingBookingId(b.id);
+                                setDeleteBookingModalOpen(true);
+                              }}
+                            >
+                              <Trash2 size={15} strokeWidth={2} />
+                            </ActionIcon>
+                          </Table.Td>
+                        </Table.Tr>
+                      ))}
+                    </Table.Tbody>
+                  </Table>
+                </div>
+              )}
           </Tabs.Panel>
         </Tabs>
       </main>

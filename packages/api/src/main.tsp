@@ -70,6 +70,10 @@ interface Bookings {
   /** List upcoming bookings sorted by startsAt ASC */
   @get list(): Booking[];
 
+  /** List past bookings sorted by startsAt DESC */
+  @route("past")
+  @get listPast(): Booking[];
+
   /** Delete a booking by id */
   @route("{id}")
   @delete delete(@path id: string):
