@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "allow": ["Bash(npx drizzle-kit:*)", "Bash(pnpm:*)"]
+    "allow": ["Bash(npx drizzle-kit:*)", "Bash(pnpm:*)", "Bash(npm test:*)"]
   },
   "prefersReducedMotion": true
 }

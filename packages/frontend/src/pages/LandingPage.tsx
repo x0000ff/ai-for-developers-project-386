@@ -1,11 +1,13 @@
 import { Clock, Calendar, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { EventType } from '@app/api';
 import { eventTypesApi } from '../api/eventTypes';
 import { Navbar } from '../components/Navbar';
 
 export function LandingPage() {
+  const { t } = useTranslation();
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,9 +16,9 @@ export function LandingPage() {
     eventTypesApi
       .list()
       .then(setEventTypes)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка загрузки'))
+      .catch((err) => setError(err instanceof Error ? err.message : t('landing.errorLoading')))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -46,9 +48,9 @@ export function LandingPage() {
             animationDelay: '0ms',
           }}
         >
-          Забронируйте звонок.
+          {t('landing.heroLine1')}
           <br />
-          Без лишних шагов.
+          {t('landing.heroLine2')}
         </h1>
 
         <div
@@ -76,7 +78,7 @@ export function LandingPage() {
             }}
           >
             <Zap size={11} strokeWidth={2.5} />
-            Выберите формат встречи
+            {t('landing.meetingFormatBadge')}
           </span>
         </div>
 
@@ -162,7 +164,7 @@ export function LandingPage() {
                 marginBottom: 8,
               }}
             >
-              Пока нет доступных форматов встреч
+              {t('landing.emptyTitle')}
             </p>
             <p
               style={{
@@ -172,7 +174,7 @@ export function LandingPage() {
                 margin: 0,
               }}
             >
-              Загляните позже — скоро здесь появятся варианты для бронирования.
+              {t('landing.emptySubtitle')}
             </p>
           </div>
         )}
@@ -199,6 +201,7 @@ export function LandingPage() {
 }
 
 function EventTypeCard({ eventType }: { eventType: EventType }) {
+  const { t } = useTranslation();
   return (
     <div
       style={{
@@ -251,7 +254,7 @@ function EventTypeCard({ eventType }: { eventType: EventType }) {
           }}
         >
           <Clock size={11} strokeWidth={2} />
-          {eventType.durationMinutes} мин
+          {t('landing.minutesSuffix', { count: eventType.durationMinutes })}
         </span>
       </div>
 
@@ -293,7 +296,7 @@ function EventTypeCard({ eventType }: { eventType: EventType }) {
         }}
       >
         <Calendar size={15} strokeWidth={2} />
-        Забронировать
+        {t('landing.bookButton')}
       </Link>
     </div>
   );

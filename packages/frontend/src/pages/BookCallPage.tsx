@@ -2,10 +2,12 @@ import { Calendar as CalendarIcon, Check, ChevronDown, Clock, Mail, User } from 
 import { Calendar } from '@mantine/dates';
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { Booking, EventType, Slot } from '@app/api';
 import { bookingsApi, ApiError } from '../api/bookings';
 import { eventTypesApi } from '../api/eventTypes';
 import { Navbar } from '../components/Navbar';
+import { getLocale } from '../utils/locale';
 
 function toLocalDateString(date: Date): string {
   const y = date.getFullYear();
@@ -16,12 +18,12 @@ function toLocalDateString(date: Date): string {
 
 const today = toLocalDateString(new Date());
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+function formatTime(iso: string, locale: string) {
+  return new Date(iso).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('ru-RU', {
+function formatDate(iso: string, locale: string) {
+  return new Date(iso).toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -29,8 +31,14 @@ function formatDate(iso: string) {
 }
 
 export function BookCallPage() {
+  const { t, i18n } = useTranslation();
+  const locale = getLocale(i18n.language);
   const [searchParams] = useSearchParams();
   const initialEventTypeId = searchParams.get('eventTypeId') ?? '';
+
+  // Calculate max date (only allow bookings up to 14 days from now)
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 14);
 
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
   const [eventTypesLoading, setEventTypesLoading] = useState(true);
@@ -76,9 +84,11 @@ export function BookCallPage() {
     bookingsApi
       .getSlots(selectedEventTypeId, dateStr)
       .then(setSlots)
-      .catch((err) => setSlotsError(err instanceof Error ? err.message : 'Ошибка загрузки слотов'))
+      .catch((err) =>
+        setSlotsError(err instanceof Error ? err.message : t('bookCall.errorLoadingSlots')),
+      )
       .finally(() => setSlotsLoading(false));
-  }, [selectedEventTypeId, selectedDate]);
+  }, [selectedEventTypeId, selectedDate, t]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -107,7 +117,7 @@ export function BookCallPage() {
           .catch(() => {})
           .finally(() => setSlotsLoading(false));
       } else {
-        setSubmitError(err instanceof Error ? err.message : 'Ошибка при бронировании');
+        setSubmitError(err instanceof Error ? err.message : t('bookCall.errorBooking'));
       }
     } finally {
       setSubmitting(false);
@@ -163,7 +173,7 @@ export function BookCallPage() {
                 marginBottom: 8,
               }}
             >
-              Звонок забронирован!
+              {t('bookCall.confirmTitle')}
             </h1>
             <p
               style={{
@@ -173,7 +183,7 @@ export function BookCallPage() {
                 marginBottom: 32,
               }}
             >
-              Ждём вас в назначенное время.
+              {t('bookCall.confirmSubtitle')}
             </p>
 
             <div
@@ -195,7 +205,7 @@ export function BookCallPage() {
               />
               <ConfirmRow
                 icon={<Clock size={15} strokeWidth={2} />}
-                label={`${formatDate(booking.startsAt)}, ${formatTime(booking.startsAt)} — ${formatTime(booking.endsAt)}`}
+                label={`${formatDate(booking.startsAt, locale)}, ${formatTime(booking.startsAt, locale)} — ${formatTime(booking.endsAt, locale)}`}
               />
               <ConfirmRow icon={<User size={15} strokeWidth={2} />} label={booking.guestName} />
               <ConfirmRow icon={<Mail size={15} strokeWidth={2} />} label={booking.guestEmail} />
@@ -219,7 +229,7 @@ export function BookCallPage() {
                 textDecoration: 'none',
               }}
             >
-              Вернуться на главную
+              {t('bookCall.confirmBackHome')}
             </Link>
           </div>
         </main>
@@ -255,7 +265,7 @@ export function BookCallPage() {
             }}
           >
             <CalendarIcon size={11} strokeWidth={2.5} />
-            Бронирование
+            {t('bookCall.badge')}
           </span>
         </div>
 
@@ -271,7 +281,7 @@ export function BookCallPage() {
             animationDelay: '80ms',
           }}
         >
-          Забронировать звонок
+          {t('bookCall.pageTitle')}
         </h1>
 
         <div
@@ -285,7 +295,10 @@ export function BookCallPage() {
           }}
         >
           {/* Event type select */}
-          <Section label="Тип встречи" icon={<CalendarIcon size={15} strokeWidth={2} />}>
+          <Section
+            label={t('bookCall.sectionEventType')}
+            icon={<CalendarIcon size={15} strokeWidth={2} />}
+          >
             {eventTypesLoading ? (
               <Spinner />
             ) : (
@@ -296,10 +309,13 @@ export function BookCallPage() {
                   onChange={(e) => setSelectedEventTypeId(e.target.value)}
                   style={selectStyle}
                 >
-                  <option value="">Выберите формат…</option>
+                  <option value="">{t('bookCall.selectPlaceholder')}</option>
                   {eventTypes.map((et) => (
                     <option key={et.id} value={et.id}>
-                      {et.durationMinutes} мин · {et.name}
+                      {t('bookCall.eventTypeOption', {
+                        duration: et.durationMinutes,
+                        name: et.name,
+                      })}
                     </option>
                   ))}
                 </select>
@@ -322,7 +338,10 @@ export function BookCallPage() {
           <Divider />
 
           {/* Date picker */}
-          <Section label="Дата" icon={<CalendarIcon size={15} strokeWidth={2} />}>
+          <Section
+            label={t('bookCall.sectionDate')}
+            icon={<CalendarIcon size={15} strokeWidth={2} />}
+          >
             <div
               style={{
                 opacity: selectedEventTypeId ? 1 : 0.5,
@@ -332,7 +351,9 @@ export function BookCallPage() {
               }}
             >
               <Calendar
+                locale={i18n.language}
                 minDate={new Date(today)}
+                maxDate={maxDate}
                 getDayProps={(date) => ({
                   selected:
                     selectedDate !== null && date.toDateString() === selectedDate.toDateString(),
@@ -349,14 +370,14 @@ export function BookCallPage() {
           {selectedEventTypeId && selectedDate && (
             <>
               <Divider />
-              <Section label="Время" icon={<Clock size={15} strokeWidth={2} />}>
+              <Section label={t('bookCall.sectionTime')} icon={<Clock size={15} strokeWidth={2} />}>
                 {slotsLoading && <Spinner />}
 
                 {!slotsLoading && slotsError && <p style={errorTextStyle}>{slotsError}</p>}
 
                 {isConflict && (
                   <div data-testid="conflict-error" style={conflictStyle}>
-                    Этот слот только что заняли. Пожалуйста, выберите другое время.
+                    {t('bookCall.conflictError')}
                   </div>
                 )}
 
@@ -368,7 +389,7 @@ export function BookCallPage() {
                       color: 'var(--fg-muted)',
                     }}
                   >
-                    Нет доступных слотов на эту дату.
+                    {t('bookCall.noSlotsAvailable')}
                   </p>
                 )}
 
@@ -382,6 +403,7 @@ export function BookCallPage() {
                     }}
                   >
                     {slots.map((slot) => {
+                      const slotTime = formatTime(slot.startsAt, locale);
                       const isSelected = selectedSlot?.startsAt === slot.startsAt;
                       return (
                         <button
@@ -407,7 +429,7 @@ export function BookCallPage() {
                             transition: 'all 0.12s ease',
                           }}
                         >
-                          {formatTime(slot.startsAt)}
+                          {slotTime}
                         </button>
                       );
                     })}
@@ -421,7 +443,10 @@ export function BookCallPage() {
           {selectedSlot && selectedEventType && (
             <>
               <Divider />
-              <Section label="Ваши данные" icon={<User size={15} strokeWidth={2} />}>
+              <Section
+                label={t('bookCall.sectionYourDetails')}
+                icon={<User size={15} strokeWidth={2} />}
+              >
                 <div
                   style={{
                     background: 'var(--bg)',
@@ -442,8 +467,8 @@ export function BookCallPage() {
                     strokeWidth={2}
                     style={{ color: 'var(--accent)', flexShrink: 0 }}
                   />
-                  {selectedEventType.name} · {formatTime(selectedSlot.startsAt)} —{' '}
-                  {formatTime(selectedSlot.endsAt)}
+                  {selectedEventType.name} · {formatTime(selectedSlot.startsAt, locale)} —{' '}
+                  {formatTime(selectedSlot.endsAt, locale)}
                 </div>
 
                 <form
@@ -452,7 +477,7 @@ export function BookCallPage() {
                 >
                   <div>
                     <label style={labelStyle} htmlFor="guestName">
-                      Имя
+                      {t('bookCall.fieldName')}
                     </label>
                     <div style={{ position: 'relative' }}>
                       <User
@@ -471,7 +496,7 @@ export function BookCallPage() {
                         data-testid="guest-name-input"
                         type="text"
                         required
-                        placeholder="Ваше имя"
+                        placeholder={t('bookCall.namePlaceholder')}
                         value={guestName}
                         onChange={(e) => setGuestName(e.target.value)}
                         style={{ ...inputStyle, paddingLeft: 36 }}
@@ -481,7 +506,7 @@ export function BookCallPage() {
 
                   <div>
                     <label style={labelStyle} htmlFor="guestEmail">
-                      Email
+                      {t('bookCall.fieldEmail')}
                     </label>
                     <div style={{ position: 'relative' }}>
                       <Mail
@@ -547,12 +572,12 @@ export function BookCallPage() {
                             display: 'inline-block',
                           }}
                         />
-                        Бронируем…
+                        {t('bookCall.submitting')}
                       </>
                     ) : (
                       <>
                         <Check size={15} strokeWidth={2.5} />
-                        Забронировать
+                        {t('bookCall.submitBooking')}
                       </>
                     )}
                   </button>

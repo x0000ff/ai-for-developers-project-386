@@ -65,3 +65,9 @@ pnpm --filter @app/backend db:migrate    # применить миграции
 - Two roles: calendar owner (can create event types, view bookings) and guest (can browse event types, book slots)
 - No auth required - single pre-defined calendar owner profile
 - One-time slots: same time cannot have two bookings, even for different event types
+
+## Code Style
+
+- **All code comments, variable names, and documentation must be in English**
+- This ensures consistency and accessibility for international contributors
+- UI text (user-facing messages, labels, errors) should follow the project language (Russian for this project)

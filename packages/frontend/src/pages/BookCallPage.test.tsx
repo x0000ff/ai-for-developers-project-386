@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Booking, EventType, Slot } from '@app/api';
+import i18n from '../i18n';
 import * as eventTypesModule from '../api/eventTypes';
 import * as bookingsModule from '../api/bookings';
 import { BookCallPage } from './BookCallPage';
@@ -68,6 +69,7 @@ function getCalendarDay(day: number) {
 describe('BookCallPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    i18n.changeLanguage('ru');
     vi.useFakeTimers({ shouldAdvanceTime: true, now: new Date('2026-04-08T12:00:00.000Z') });
     vi.mocked(eventTypesModule.eventTypesApi.list).mockResolvedValue(mockEventTypes);
   });

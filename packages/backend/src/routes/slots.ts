@@ -13,6 +13,14 @@ export async function slotsRoutes(app: FastifyInstance, { db }: { db: Db }) {
         return reply.status(400).send({ message: 'date query param is required (YYYY-MM-DD)' });
       }
 
+      // Validate that requested date is within the next 14 days
+      const maxAllowedDate = new Date();
+      maxAllowedDate.setDate(maxAllowedDate.getDate() + 14);
+      const requestedDate = new Date(date);
+      if (requestedDate > maxAllowedDate) {
+        return reply.status(400).send({ message: 'Date is too far in the future (max 14 days)' });
+      }
+
       const slots = listAvailable(db, req.params.id, date, new Date());
       if (slots === null) {
         return reply.status(404).send({ message: 'Not found' });

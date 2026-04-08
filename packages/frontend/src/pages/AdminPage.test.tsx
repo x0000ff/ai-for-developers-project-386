@@ -3,6 +3,7 @@ import { render, screen, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Booking, EventType } from '@app/api';
+import i18n from '../i18n';
 import * as eventTypesModule from '../api/eventTypes';
 import * as bookingsModule from '../api/bookings';
 import { AdminPage } from './AdminPage';
@@ -67,6 +68,7 @@ function renderPage() {
 describe('AdminPage — секция предстоящих встреч', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    i18n.changeLanguage('ru');
     vi.mocked(eventTypesModule.eventTypesApi.list).mockResolvedValue(mockEventTypes);
   });
 
