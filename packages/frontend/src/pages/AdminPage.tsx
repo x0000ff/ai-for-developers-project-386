@@ -175,6 +175,10 @@ export function AdminPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  const [deletingBookingId, setDeletingBookingId] = useState<string | null>(null);
+  const [deleteBookingModalOpen, setDeleteBookingModalOpen] = useState(false);
+  const [deleteBookingLoading, setDeleteBookingLoading] = useState(false);
+
   useEffect(() => {
     loadEventTypes();
     loadBookings();
@@ -240,6 +244,19 @@ export function AdminPage() {
       setEditError(err instanceof Error ? err.message : 'Ошибка обновления');
     } finally {
       setEditLoading(false);
+    }
+  }
+
+  async function handleDeleteBooking() {
+    if (!deletingBookingId) return;
+    setDeleteBookingLoading(true);
+    try {
+      await bookingsApi.deleteBooking(deletingBookingId);
+      setDeleteBookingModalOpen(false);
+      setDeletingBookingId(null);
+      await loadBookings();
+    } finally {
+      setDeleteBookingLoading(false);
     }
   }
 
@@ -603,6 +620,7 @@ export function AdminPage() {
                       <Table.Th>Тип встречи</Table.Th>
                       <Table.Th>Гость</Table.Th>
                       <Table.Th>Email</Table.Th>
+                      <Table.Th style={{ width: 60 }}></Table.Th>
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
@@ -659,6 +677,19 @@ export function AdminPage() {
                         <Table.Td>{b.guestName}</Table.Td>
                         <Table.Td>
                           <span style={{ color: 'var(--fg-muted)' }}>{b.guestEmail}</span>
+                        </Table.Td>
+                        <Table.Td>
+                          <ActionIcon
+                            variant="subtle"
+                            color="red"
+                            title="Удалить встречу"
+                            onClick={() => {
+                              setDeletingBookingId(b.id);
+                              setDeleteBookingModalOpen(true);
+                            }}
+                          >
+                            <Trash2 size={15} strokeWidth={2} />
+                          </ActionIcon>
                         </Table.Td>
                       </Table.Tr>
                     ))}
@@ -746,6 +777,65 @@ export function AdminPage() {
             loading={editLoading}
           />
         )}
+      </Modal>
+
+      {/* Delete Booking Confirmation Modal */}
+      <Modal
+        opened={deleteBookingModalOpen}
+        onClose={() => !deleteBookingLoading && setDeleteBookingModalOpen(false)}
+        title={
+          <Text
+            style={{
+              fontFamily: 'var(--font)',
+              fontWeight: 700,
+              fontSize: 18,
+              letterSpacing: '-0.03em',
+              color: 'var(--fg)',
+            }}
+          >
+            Удалить встречу
+          </Text>
+        }
+        centered
+        size="sm"
+        styles={{
+          content: { borderRadius: 14 },
+          header: { paddingBottom: 8 },
+        }}
+      >
+        <Stack gap={16}>
+          <Text style={{ fontFamily: 'var(--font)', fontSize: 14, color: 'var(--fg)' }}>
+            Вы уверены, что хотите удалить эту встречу? Это действие нельзя отменить.
+          </Text>
+          <Group justify="flex-end" gap={8}>
+            <Button
+              variant="subtle"
+              onClick={() => setDeleteBookingModalOpen(false)}
+              disabled={deleteBookingLoading}
+              styles={{
+                root: {
+                  fontFamily: 'var(--font)',
+                  color: 'var(--fg-muted)',
+                  fontWeight: 500,
+                  fontSize: 14,
+                },
+              }}
+            >
+              Отмена
+            </Button>
+            <Button
+              color="red"
+              onClick={handleDeleteBooking}
+              loading={deleteBookingLoading}
+              data-testid="delete-booking-confirm"
+              styles={{
+                root: { fontFamily: 'var(--font)', fontWeight: 600, fontSize: 14 },
+              }}
+            >
+              Удалить
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
 
       {/* Delete Confirmation Modal */}

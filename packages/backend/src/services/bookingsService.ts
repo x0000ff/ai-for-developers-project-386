@@ -4,8 +4,8 @@ import type { Db } from '../db/index.js';
 import { bookings, eventTypes } from '../db/schema.js';
 
 export class NotFoundError extends Error {
-  constructor() {
-    super('Event type not found');
+  constructor(message = 'Not found') {
+    super(message);
   }
 }
 
@@ -86,6 +86,12 @@ export function makeBookingsService(db: Db) {
       }
 
       return toDto(row);
+    },
+
+    deleteById(id: string): void {
+      const existing = db.select().from(bookings).where(eq(bookings.id, id)).get();
+      if (!existing) throw new NotFoundError(`Booking ${id} not found`);
+      db.delete(bookings).where(eq(bookings.id, id)).run();
     },
 
     listUpcoming(now: Date = new Date()): Booking[] {

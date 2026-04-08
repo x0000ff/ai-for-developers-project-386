@@ -40,4 +40,12 @@ export const bookingsApi = {
     const response = await fetch(`${API_BASE_URL}/api/bookings`);
     return handleResponse<Booking[]>(response);
   },
+
+  deleteBooking: async (id: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/api/bookings/${id}`, { method: 'DELETE' });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw new ApiError(data.message || `API error: ${response.status}`, response.status);
+    }
+  },
 };

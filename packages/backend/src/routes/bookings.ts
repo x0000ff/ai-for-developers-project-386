@@ -39,4 +39,14 @@ export async function bookingsRoutes(app: FastifyInstance, { db }: { db: Db }) {
   app.get('/bookings', async () => {
     return service.listUpcoming();
   });
+
+  app.delete<{ Params: { id: string } }>('/bookings/:id', async (req, reply) => {
+    try {
+      service.deleteById(req.params.id);
+      return reply.status(204).send();
+    } catch (err) {
+      if (err instanceof NotFoundError) return reply.status(404).send({ message: err.message });
+      throw err;
+    }
+  });
 }

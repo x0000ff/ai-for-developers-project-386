@@ -143,6 +143,32 @@ describe('Bookings routes', () => {
     expect(res.statusCode).toBe(400);
   });
 
+  it('DELETE /api/bookings/:id returns 204 on success', async () => {
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/api/bookings',
+      payload: {
+        eventTypeId,
+        startsAt: FUTURE_ISO,
+        guestName: 'Alice',
+        guestEmail: 'alice@example.com',
+      },
+    });
+    expect(createRes.statusCode).toBe(201);
+    const { id } = createRes.json<{ id: string }>();
+
+    const deleteRes = await app.inject({ method: 'DELETE', url: `/api/bookings/${id}` });
+    expect(deleteRes.statusCode).toBe(204);
+
+    const listRes = await app.inject({ method: 'GET', url: '/api/bookings' });
+    expect(listRes.json()).toHaveLength(0);
+  });
+
+  it('DELETE /api/bookings/:id returns 404 for unknown id', async () => {
+    const res = await app.inject({ method: 'DELETE', url: '/api/bookings/nonexistent' });
+    expect(res.statusCode).toBe(404);
+  });
+
   it('full cycle: POST → GET', async () => {
     const createRes = await app.inject({
       method: 'POST',

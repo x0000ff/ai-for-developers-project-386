@@ -69,6 +69,12 @@ interface Bookings {
 
   /** List upcoming bookings sorted by startsAt ASC */
   @get list(): Booking[];
+
+  /** Delete a booking by id */
+  @route("{id}")
+  @delete delete(@path id: string):
+    | { @statusCode _: 204 }
+    | { @statusCode _: 404; message: string };
 }
 
 @route("/api/event-types")

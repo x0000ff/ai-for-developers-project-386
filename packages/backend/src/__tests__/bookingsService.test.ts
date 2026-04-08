@@ -169,6 +169,23 @@ describe('bookingsService', () => {
     ).toThrow(ConflictError);
   });
 
+  it('deleteById removes an existing booking', () => {
+    const et = eventTypesRepo.create({ name: 'Call', durationMinutes: 30 });
+    const booking = service.create(
+      { eventTypeId: et.id, startsAt: FUTURE, guestName: 'Alice', guestEmail: 'alice@example.com' },
+      NOW,
+    );
+
+    service.deleteById(booking.id);
+
+    const upcoming = service.listUpcoming(NOW);
+    expect(upcoming).toHaveLength(0);
+  });
+
+  it('deleteById throws NotFoundError for unknown id', () => {
+    expect(() => service.deleteById('nonexistent')).toThrow(NotFoundError);
+  });
+
   it('listUpcoming returns only future bookings sorted by startsAt ASC', () => {
     const et = eventTypesRepo.create({ name: 'Call', durationMinutes: 15 });
     const t1 = '2025-06-01T13:00:00.000Z';

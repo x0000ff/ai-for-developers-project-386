@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Booking, EventType } from '@app/api';
@@ -24,6 +24,7 @@ vi.mock('../api/bookings', async (importOriginal) => {
       getSlots: vi.fn(),
       createBooking: vi.fn(),
       listUpcoming: vi.fn(),
+      deleteBooking: vi.fn(),
     },
   };
 });
@@ -106,5 +107,59 @@ describe('AdminPage — секция предстоящих встреч', () =>
     const empty = await screen.findByTestId('bookings-empty');
     expect(empty).toBeInTheDocument();
     expect(screen.getByText(/предстоящих встреч пока нет/i)).toBeInTheDocument();
+  });
+
+  it('иконка удаления отображается в таблице бронирований', async () => {
+    vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue(mockBookings);
+
+    renderPage();
+
+    const table = await screen.findByTestId('bookings-table');
+    const deleteButtons = within(table).getAllByTitle('Удалить встречу');
+    expect(deleteButtons).toHaveLength(mockBookings.length);
+  });
+
+  it('клик по иконке удаления открывает модальное окно подтверждения', async () => {
+    vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue(mockBookings);
+
+    renderPage();
+
+    const table = await screen.findByTestId('bookings-table');
+    const deleteButtons = within(table).getAllByTitle('Удалить встречу');
+    fireEvent.click(deleteButtons[0]);
+
+    expect(await screen.findByText('Удалить встречу')).toBeInTheDocument();
+    expect(screen.getByText(/вы уверены/i)).toBeInTheDocument();
+  });
+
+  it('подтверждение удаления вызывает deleteBooking и обновляет список', async () => {
+    vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue(mockBookings);
+    vi.mocked(bookingsModule.bookingsApi.deleteBooking).mockResolvedValue(undefined);
+
+    renderPage();
+
+    const table = await screen.findByTestId('bookings-table');
+    const deleteButtons = within(table).getAllByTitle('Удалить встречу');
+    fireEvent.click(deleteButtons[0]);
+
+    const confirmBtn = await screen.findByTestId('delete-booking-confirm');
+    fireEvent.click(confirmBtn);
+
+    expect(bookingsModule.bookingsApi.deleteBooking).toHaveBeenCalledWith(mockBookings[0].id);
+  });
+
+  it('отмена в модальном окне не вызывает deleteBooking', async () => {
+    vi.mocked(bookingsModule.bookingsApi.listUpcoming).mockResolvedValue(mockBookings);
+
+    renderPage();
+
+    const table = await screen.findByTestId('bookings-table');
+    const deleteButtons = within(table).getAllByTitle('Удалить встречу');
+    fireEvent.click(deleteButtons[0]);
+
+    const cancelBtn = await screen.findByRole('button', { name: 'Отмена' });
+    fireEvent.click(cancelBtn);
+
+    expect(bookingsModule.bookingsApi.deleteBooking).not.toHaveBeenCalled();
   });
 });
