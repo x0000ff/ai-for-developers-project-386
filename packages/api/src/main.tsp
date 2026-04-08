@@ -101,6 +101,9 @@ interface EventTypes {
     @statusCode statusCode: 204;
   } | NotFoundResponse;
 
-  /** List available slots for an event type on a given date */
-  @get @route("{id}/slots") slots(@path id: string, @query date: string): Slot[] | NotFoundResponse;
+  /** List available slots for an event type on a given date; 400 if invalid/too far date, 404 if event type not found */
+  @get @route("{id}/slots") slots(@path id: string, @query date: string):
+    | Slot[]
+    | { @statusCode statusCode: 400; @body body: ErrorResponse; }
+    | NotFoundResponse;
 }

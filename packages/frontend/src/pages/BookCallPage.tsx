@@ -32,6 +32,10 @@ export function BookCallPage() {
   const [searchParams] = useSearchParams();
   const initialEventTypeId = searchParams.get('eventTypeId') ?? '';
 
+  // Calculate max date (only allow bookings up to 14 days from now)
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 14);
+
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
   const [eventTypesLoading, setEventTypesLoading] = useState(true);
 
@@ -333,6 +337,7 @@ export function BookCallPage() {
             >
               <Calendar
                 minDate={new Date(today)}
+                maxDate={maxDate}
                 getDayProps={(date) => ({
                   selected:
                     selectedDate !== null && date.toDateString() === selectedDate.toDateString(),
