@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, asc } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import type { Db } from '../db/index.js';
 import { eventTypes } from '../db/schema.js';
@@ -9,7 +9,7 @@ export type NewEventType = typeof eventTypes.$inferInsert;
 export function makeEventTypesRepo(db: Db) {
   return {
     list(): EventType[] {
-      return db.select().from(eventTypes).all();
+      return db.select().from(eventTypes).orderBy(asc(eventTypes.durationMinutes)).all();
     },
 
     getById(id: string): EventType | undefined {
