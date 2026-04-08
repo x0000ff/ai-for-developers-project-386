@@ -299,7 +299,7 @@ export function BookCallPage() {
                   <option value="">Выберите формат…</option>
                   {eventTypes.map((et) => (
                     <option key={et.id} value={et.id}>
-                      {et.name} · {et.durationMinutes} мин
+                      {et.durationMinutes} мин · {et.name}
                     </option>
                   ))}
                 </select>
