@@ -271,7 +271,7 @@ function EventTypeCard({ eventType }: { eventType: EventType }) {
           alignItems: 'center',
           justifyContent: 'center',
           gap: 8,
-          marginTop: 4,
+          marginTop: 'auto',
           padding: '11px 20px',
           background: 'var(--accent)',
           color: 'var(--accent-fg)',
