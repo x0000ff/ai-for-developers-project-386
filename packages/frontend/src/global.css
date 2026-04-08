@@ -93,11 +93,14 @@ body {
   transform: translateY(-2px);
 }
 
-/* Admin tabs — active tab highlight */
+/* Admin tabs pills */
+.mantine-Tabs-tab {
+  background: transparent !important;
+  color: var(--fg) !important;
+}
 .mantine-Tabs-tab[data-active] {
-  background: white !important;
-  color: var(--accent) !important;
-  border-color: var(--border) !important;
+  background: var(--accent) !important;
+  color: white !important;
 }
 
 /* Override Mantine subtle variant hover — replace default blue with neutral gray */

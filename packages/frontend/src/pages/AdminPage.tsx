@@ -264,7 +264,7 @@ export function AdminPage() {
       >
         <Tabs
           defaultValue="event-types"
-          variant="outline"
+          variant="pills"
           orientation="vertical"
           styles={{
             root: { display: 'flex', alignItems: 'flex-start', gap: 0 },
