@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "pnpm --parallel -r dev",
     "build": "pnpm --filter @app/api build && pnpm --filter @app/frontend build && pnpm --filter @app/backend build",
-    "test": "pnpm --filter @app/backend test",
+    "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",
     "format": "prettier --write ."
