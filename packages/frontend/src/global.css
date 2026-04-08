@@ -93,6 +93,13 @@ body {
   transform: translateY(-2px);
 }
 
+/* Admin tabs — active tab highlight */
+.mantine-Tabs-tab[data-active] {
+  background: white !important;
+  color: var(--accent) !important;
+  border-color: var(--border) !important;
+}
+
 /* Override Mantine subtle variant hover — replace default blue with neutral gray */
 button[data-variant='subtle']:not([data-color]):hover,
 button[data-variant='subtle'][data-color='gray']:hover {

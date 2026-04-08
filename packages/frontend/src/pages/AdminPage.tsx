@@ -7,6 +7,7 @@ import {
   NumberInput,
   Stack,
   Table,
+  Tabs,
   Text,
   Textarea,
   TextInput,
@@ -256,448 +257,397 @@ export function AdminPage() {
 
       <main
         style={{
-          maxWidth: 760,
+          maxWidth: 1000,
           margin: '0 auto',
           padding: '40px 24px',
         }}
       >
-        {/* Header */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 32,
+        <Tabs
+          defaultValue="event-types"
+          variant="outline"
+          orientation="vertical"
+          styles={{
+            root: { display: 'flex', alignItems: 'flex-start', gap: 0 },
+            list: { width: 200, flexShrink: 0 },
+            tab: { fontFamily: 'var(--font)', fontWeight: 500, fontSize: 14 },
+            panel: { flex: 1, paddingLeft: 24 },
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <Tabs.List>
+            <Tabs.Tab value="event-types" leftSection={<ShieldCheck size={15} strokeWidth={2} />}>
+              Типы встреч
+            </Tabs.Tab>
+            <Tabs.Tab value="bookings" leftSection={<CalendarClock size={15} strokeWidth={2} />}>
+              Предстоящие встречи
+            </Tabs.Tab>
+          </Tabs.List>
+
+          {/* Event Types Panel */}
+          <Tabs.Panel value="event-types">
             <div
               style={{
-                width: 44,
-                height: 44,
-                background: 'var(--accent)',
-                borderRadius: 12,
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
+                justifyContent: 'flex-end',
+                marginBottom: 20,
               }}
             >
-              <ShieldCheck size={22} color="white" strokeWidth={2} />
-            </div>
-            <div>
-              <h1
-                style={{
-                  fontFamily: 'var(--font)',
-                  fontWeight: 700,
-                  fontSize: 26,
-                  letterSpacing: '-0.04em',
-                  color: 'var(--fg)',
-                  margin: 0,
-                  lineHeight: 1.2,
+              <button
+                className="cta-btn"
+                onClick={() => {
+                  setCreateError(null);
+                  setCreateOpen(true);
                 }}
-              >
-                Типы встреч
-              </h1>
-              <p
                 style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '10px 20px',
+                  background: 'var(--accent)',
+                  color: 'var(--accent-fg)',
+                  border: 'none',
+                  borderRadius: 8,
                   fontFamily: 'var(--font)',
-                  fontSize: 13,
-                  color: 'var(--fg-muted)',
-                  margin: 0,
-                  marginTop: 2,
-                }}
-              >
-                Управляйте доступными форматами встреч
-              </p>
-            </div>
-          </div>
-
-          <button
-            className="cta-btn"
-            onClick={() => {
-              setCreateError(null);
-              setCreateOpen(true);
-            }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '10px 20px',
-              background: 'var(--accent)',
-              color: 'var(--accent-fg)',
-              border: 'none',
-              borderRadius: 8,
-              fontFamily: 'var(--font)',
-              fontWeight: 600,
-              fontSize: 14,
-              letterSpacing: '-0.01em',
-              cursor: 'pointer',
-            }}
-          >
-            <Plus size={16} strokeWidth={2} />
-            Создать
-          </button>
-        </div>
-
-        {/* Content */}
-        {loading && (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: 200,
-            }}
-          >
-            <Loader size="md" color="var(--accent)" />
-          </div>
-        )}
-
-        {!loading && error && (
-          <div
-            style={{
-              padding: '16px 20px',
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: 10,
-              fontFamily: 'var(--font)',
-              fontSize: 14,
-              color: '#dc2626',
-            }}
-          >
-            {error}
-          </div>
-        )}
-
-        {!loading && !error && eventTypes.length === 0 && (
-          <div
-            style={{
-              textAlign: 'center',
-              padding: '60px 24px',
-              border: '1px dashed var(--border)',
-              borderRadius: 12,
-            }}
-          >
-            <p
-              style={{
-                fontFamily: 'var(--font)',
-                fontSize: 15,
-                color: 'var(--fg-muted)',
-                margin: 0,
-              }}
-            >
-              Пока нет ни одного типа встречи. Нажмите «Создать», чтобы добавить первый.
-            </p>
-          </div>
-        )}
-
-        {!loading && !error && eventTypes.length > 0 && (
-          <div
-            style={{
-              border: '1px solid var(--border)',
-              borderRadius: 12,
-              overflow: 'hidden',
-              background: 'white',
-            }}
-          >
-            <Table
-              highlightOnHover
-              styles={{
-                thead: { background: '#faf9f7' },
-                th: {
-                  fontFamily: 'var(--font)',
-                  fontSize: 12,
                   fontWeight: 600,
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase',
-                  color: 'var(--fg-muted)',
-                  padding: '12px 16px',
-                },
-                td: {
-                  fontFamily: 'var(--font)',
                   fontSize: 14,
-                  color: 'var(--fg)',
-                  padding: '14px 16px',
-                  verticalAlign: 'middle',
-                },
-              }}
-            >
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Название</Table.Th>
-                  <Table.Th style={{ width: 140 }}>Длительность</Table.Th>
-                  <Table.Th>Описание</Table.Th>
-                  <Table.Th style={{ width: 100 }}></Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {eventTypes.map((et) => (
-                  <Table.Tr key={et.id}>
-                    <Table.Td>
-                      <span style={{ fontWeight: 500 }}>{et.name}</span>
-                    </Table.Td>
-                    <Table.Td>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          padding: '4px 10px',
-                          background: 'var(--bg)',
-                          border: '1px solid var(--border)',
-                          borderRadius: 6,
-                          fontSize: 13,
-                          fontWeight: 500,
-                        }}
-                      >
-                        {et.durationMinutes} мин
-                      </span>
-                    </Table.Td>
-                    <Table.Td>
-                      <span style={{ color: 'var(--fg-muted)' }}>
-                        {et.description || <em style={{ opacity: 0.5 }}>—</em>}
-                      </span>
-                    </Table.Td>
-                    <Table.Td>
-                      <Group gap={6} justify="flex-end">
-                        <ActionIcon
-                          variant="subtle"
-                          onClick={() => {
-                            setEditError(null);
-                            setEditTarget(et);
-                          }}
-                          title="Редактировать"
-                          style={{ color: 'var(--fg-muted)' }}
-                        >
-                          <Edit2 size={15} strokeWidth={2} />
-                        </ActionIcon>
-                        <ActionIcon
-                          variant="subtle"
-                          color="red"
-                          onClick={() => {
-                            setDeleteError(null);
-                            setDeleteTarget(et);
-                          }}
-                          title="Удалить"
-                        >
-                          <Trash2 size={15} strokeWidth={2} />
-                        </ActionIcon>
-                      </Group>
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </div>
-        )}
-        {/* Upcoming Bookings Section */}
-        <div style={{ marginTop: 48 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 20,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  letterSpacing: '-0.01em',
+                  cursor: 'pointer',
+                }}
+              >
+                <Plus size={16} strokeWidth={2} />
+                Создать
+              </button>
+            </div>
+
+            {loading && (
               <div
                 style={{
-                  width: 36,
-                  height: 36,
-                  background: 'var(--accent)',
-                  borderRadius: 10,
                   display: 'flex',
-                  alignItems: 'center',
                   justifyContent: 'center',
-                  flexShrink: 0,
+                  alignItems: 'center',
+                  minHeight: 200,
                 }}
               >
-                <CalendarClock size={18} color="white" strokeWidth={2} />
+                <Loader size="md" color="var(--accent)" />
               </div>
-              <div>
-                <h2
+            )}
+
+            {!loading && error && (
+              <div
+                style={{
+                  padding: '16px 20px',
+                  background: '#fef2f2',
+                  border: '1px solid #fecaca',
+                  borderRadius: 10,
+                  fontFamily: 'var(--font)',
+                  fontSize: 14,
+                  color: '#dc2626',
+                }}
+              >
+                {error}
+              </div>
+            )}
+
+            {!loading && !error && eventTypes.length === 0 && (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '60px 24px',
+                  border: '1px dashed var(--border)',
+                  borderRadius: 12,
+                }}
+              >
+                <p
                   style={{
                     fontFamily: 'var(--font)',
-                    fontWeight: 700,
-                    fontSize: 20,
-                    letterSpacing: '-0.04em',
-                    color: 'var(--fg)',
+                    fontSize: 15,
+                    color: 'var(--fg-muted)',
                     margin: 0,
-                    lineHeight: 1.2,
                   }}
                 >
-                  Предстоящие встречи
-                </h2>
+                  Пока нет ни одного типа встречи. Нажмите «Создать», чтобы добавить первый.
+                </p>
               </div>
-            </div>
+            )}
 
-            <button
-              onClick={loadBookings}
-              disabled={bookingsLoading}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '8px 16px',
-                background: 'white',
-                color: 'var(--fg)',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                fontFamily: 'var(--font)',
-                fontWeight: 500,
-                fontSize: 13,
-                cursor: bookingsLoading ? 'not-allowed' : 'pointer',
-                opacity: bookingsLoading ? 0.6 : 1,
-              }}
-            >
-              <RefreshCw size={14} strokeWidth={2} />
-              Обновить
-            </button>
-          </div>
-
-          {bookingsLoading && (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: 120,
-              }}
-            >
-              <Loader size="md" color="var(--accent)" />
-            </div>
-          )}
-
-          {!bookingsLoading && bookingsError && (
-            <div
-              style={{
-                padding: '16px 20px',
-                background: '#fef2f2',
-                border: '1px solid #fecaca',
-                borderRadius: 10,
-                fontFamily: 'var(--font)',
-                fontSize: 14,
-                color: '#dc2626',
-              }}
-            >
-              {bookingsError}
-            </div>
-          )}
-
-          {!bookingsLoading && !bookingsError && bookings.length === 0 && (
-            <div
-              data-testid="bookings-empty"
-              style={{
-                textAlign: 'center',
-                padding: '48px 24px',
-                border: '1px dashed var(--border)',
-                borderRadius: 12,
-              }}
-            >
-              <p
+            {!loading && !error && eventTypes.length > 0 && (
+              <div
                 style={{
-                  fontFamily: 'var(--font)',
-                  fontSize: 15,
-                  color: 'var(--fg-muted)',
-                  margin: 0,
+                  border: '1px solid var(--border)',
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  background: 'white',
                 }}
               >
-                Предстоящих встреч пока нет.
-              </p>
-            </div>
-          )}
-
-          {!bookingsLoading && !bookingsError && bookings.length > 0 && (
-            <div
-              data-testid="bookings-table"
-              style={{
-                border: '1px solid var(--border)',
-                borderRadius: 12,
-                overflow: 'hidden',
-                background: 'white',
-              }}
-            >
-              <Table
-                highlightOnHover
-                styles={{
-                  thead: { background: '#faf9f7' },
-                  th: {
-                    fontFamily: 'var(--font)',
-                    fontSize: 12,
-                    fontWeight: 600,
-                    letterSpacing: '0.05em',
-                    textTransform: 'uppercase',
-                    color: 'var(--fg-muted)',
-                    padding: '12px 16px',
-                  },
-                  td: {
-                    fontFamily: 'var(--font)',
-                    fontSize: 14,
-                    color: 'var(--fg)',
-                    padding: '14px 16px',
-                    verticalAlign: 'middle',
-                  },
-                }}
-              >
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Начало</Table.Th>
-                    <Table.Th>Конец</Table.Th>
-                    <Table.Th>Тип встречи</Table.Th>
-                    <Table.Th>Гость</Table.Th>
-                    <Table.Th>Email</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {bookings.map((b) => (
-                    <Table.Tr key={b.id}>
-                      <Table.Td>
-                        <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {formatDateTime(b.startsAt)}
-                        </span>
-                      </Table.Td>
-                      <Table.Td>
-                        <span
-                          style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--fg-muted)' }}
-                        >
-                          {formatDateTime(b.endsAt)}
-                        </span>
-                      </Table.Td>
-                      <Table.Td>
-                        {b.eventTypeId === null ? (
+                <Table
+                  highlightOnHover
+                  styles={{
+                    thead: { background: '#faf9f7' },
+                    th: {
+                      fontFamily: 'var(--font)',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase',
+                      color: 'var(--fg-muted)',
+                      padding: '12px 16px',
+                    },
+                    td: {
+                      fontFamily: 'var(--font)',
+                      fontSize: 14,
+                      color: 'var(--fg)',
+                      padding: '14px 16px',
+                      verticalAlign: 'middle',
+                    },
+                  }}
+                >
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Название</Table.Th>
+                      <Table.Th style={{ width: 140 }}>Длительность</Table.Th>
+                      <Table.Th>Описание</Table.Th>
+                      <Table.Th style={{ width: 100 }}></Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {eventTypes.map((et) => (
+                      <Table.Tr key={et.id}>
+                        <Table.Td>
+                          <span style={{ fontWeight: 500 }}>{et.name}</span>
+                        </Table.Td>
+                        <Table.Td>
                           <span
-                            data-testid="deleted-type-badge"
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
-                              padding: '3px 8px',
+                              padding: '4px 10px',
                               background: 'var(--bg)',
                               border: '1px solid var(--border)',
                               borderRadius: 6,
-                              fontSize: 12,
+                              fontSize: 13,
                               fontWeight: 500,
-                              color: 'var(--fg-muted)',
-                              fontStyle: 'italic',
                             }}
                           >
-                            Тип удалён
+                            {et.durationMinutes} мин
                           </span>
-                        ) : (
-                          <span style={{ fontWeight: 500 }}>{b.eventTypeName}</span>
-                        )}
-                      </Table.Td>
-                      <Table.Td>{b.guestName}</Table.Td>
-                      <Table.Td>
-                        <span style={{ color: 'var(--fg-muted)' }}>{b.guestEmail}</span>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))}
-                </Table.Tbody>
-              </Table>
+                        </Table.Td>
+                        <Table.Td>
+                          <span style={{ color: 'var(--fg-muted)' }}>
+                            {et.description || <em style={{ opacity: 0.5 }}>—</em>}
+                          </span>
+                        </Table.Td>
+                        <Table.Td>
+                          <Group gap={6} justify="flex-end">
+                            <ActionIcon
+                              variant="subtle"
+                              onClick={() => {
+                                setEditError(null);
+                                setEditTarget(et);
+                              }}
+                              title="Редактировать"
+                              style={{ color: 'var(--fg-muted)' }}
+                            >
+                              <Edit2 size={15} strokeWidth={2} />
+                            </ActionIcon>
+                            <ActionIcon
+                              variant="subtle"
+                              color="red"
+                              onClick={() => {
+                                setDeleteError(null);
+                                setDeleteTarget(et);
+                              }}
+                              title="Удалить"
+                            >
+                              <Trash2 size={15} strokeWidth={2} />
+                            </ActionIcon>
+                          </Group>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              </div>
+            )}
+          </Tabs.Panel>
+
+          {/* Bookings Panel */}
+          <Tabs.Panel value="bookings">
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginBottom: 20,
+              }}
+            >
+              <button
+                onClick={loadBookings}
+                disabled={bookingsLoading}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 16px',
+                  background: 'white',
+                  color: 'var(--fg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 8,
+                  fontFamily: 'var(--font)',
+                  fontWeight: 500,
+                  fontSize: 13,
+                  cursor: bookingsLoading ? 'not-allowed' : 'pointer',
+                  opacity: bookingsLoading ? 0.6 : 1,
+                }}
+              >
+                <RefreshCw size={14} strokeWidth={2} />
+                Обновить
+              </button>
             </div>
-          )}
-        </div>
+
+            {bookingsLoading && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: 120,
+                }}
+              >
+                <Loader size="md" color="var(--accent)" />
+              </div>
+            )}
+
+            {!bookingsLoading && bookingsError && (
+              <div
+                style={{
+                  padding: '16px 20px',
+                  background: '#fef2f2',
+                  border: '1px solid #fecaca',
+                  borderRadius: 10,
+                  fontFamily: 'var(--font)',
+                  fontSize: 14,
+                  color: '#dc2626',
+                }}
+              >
+                {bookingsError}
+              </div>
+            )}
+
+            {!bookingsLoading && !bookingsError && bookings.length === 0 && (
+              <div
+                data-testid="bookings-empty"
+                style={{
+                  textAlign: 'center',
+                  padding: '48px 24px',
+                  border: '1px dashed var(--border)',
+                  borderRadius: 12,
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: 'var(--font)',
+                    fontSize: 15,
+                    color: 'var(--fg-muted)',
+                    margin: 0,
+                  }}
+                >
+                  Предстоящих встреч пока нет.
+                </p>
+              </div>
+            )}
+
+            {!bookingsLoading && !bookingsError && bookings.length > 0 && (
+              <div
+                data-testid="bookings-table"
+                style={{
+                  border: '1px solid var(--border)',
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  background: 'white',
+                }}
+              >
+                <Table
+                  highlightOnHover
+                  styles={{
+                    thead: { background: '#faf9f7' },
+                    th: {
+                      fontFamily: 'var(--font)',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase',
+                      color: 'var(--fg-muted)',
+                      padding: '12px 16px',
+                    },
+                    td: {
+                      fontFamily: 'var(--font)',
+                      fontSize: 14,
+                      color: 'var(--fg)',
+                      padding: '14px 16px',
+                      verticalAlign: 'middle',
+                    },
+                  }}
+                >
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Начало</Table.Th>
+                      <Table.Th>Конец</Table.Th>
+                      <Table.Th>Тип встречи</Table.Th>
+                      <Table.Th>Гость</Table.Th>
+                      <Table.Th>Email</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {bookings.map((b) => (
+                      <Table.Tr key={b.id}>
+                        <Table.Td>
+                          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                            {formatDateTime(b.startsAt)}
+                          </span>
+                        </Table.Td>
+                        <Table.Td>
+                          <span
+                            style={{
+                              fontVariantNumeric: 'tabular-nums',
+                              color: 'var(--fg-muted)',
+                            }}
+                          >
+                            {formatDateTime(b.endsAt)}
+                          </span>
+                        </Table.Td>
+                        <Table.Td>
+                          {b.eventTypeId === null ? (
+                            <span
+                              data-testid="deleted-type-badge"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                padding: '3px 8px',
+                                background: 'var(--bg)',
+                                border: '1px solid var(--border)',
+                                borderRadius: 6,
+                                fontSize: 12,
+                                fontWeight: 500,
+                                color: 'var(--fg-muted)',
+                                fontStyle: 'italic',
+                              }}
+                            >
+                              Тип удалён
+                            </span>
+                          ) : (
+                            <span style={{ fontWeight: 500 }}>{b.eventTypeName}</span>
+                          )}
+                        </Table.Td>
+                        <Table.Td>{b.guestName}</Table.Td>
+                        <Table.Td>
+                          <span style={{ color: 'var(--fg-muted)' }}>{b.guestEmail}</span>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              </div>
+            )}
+          </Tabs.Panel>
+        </Tabs>
       </main>
 
       {/* Create Modal */}
