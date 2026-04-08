@@ -1,7 +1,9 @@
 import { CalendarDays, ShieldCheck } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export function Navbar() {
+  const { t } = useTranslation();
   const location = useLocation();
   const isAdminPage = location.pathname === '/admin';
   return (
@@ -55,7 +57,7 @@ export function Navbar() {
               letterSpacing: '-0.02em',
             }}
           >
-            Созвончик 🤙
+            {t('nav.logoName')}
           </span>
         </Link>
 
@@ -82,7 +84,7 @@ export function Navbar() {
               }}
             >
               <ShieldCheck size={14} strokeWidth={2} />
-              Админка
+              {t('nav.admin')}
             </Link>
           )}
         </div>

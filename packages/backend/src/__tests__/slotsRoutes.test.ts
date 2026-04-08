@@ -23,9 +23,13 @@ describe('Slots routes', () => {
 
   it('GET /api/event-types/:id/slots returns 200 with slot array', async () => {
     const et = repo.create({ name: 'Demo', durationMinutes: 30 });
+    // Use a date 5 days in the future (within the 14-day limit)
+    const date = new Date();
+    date.setDate(date.getDate() + 5);
+    const dateStr = date.toISOString().split('T')[0];
     const res = await app.inject({
       method: 'GET',
-      url: `/api/event-types/${et.id}/slots?date=2030-06-15`,
+      url: `/api/event-types/${et.id}/slots?date=${dateStr}`,
     });
     expect(res.statusCode).toBe(200);
     const body = res.json<Array<{ startsAt: string; endsAt: string }>>();
@@ -36,9 +40,13 @@ describe('Slots routes', () => {
   });
 
   it('returns 404 for unknown event type', async () => {
+    // Use a date 5 days in the future (within the 14-day limit)
+    const date = new Date();
+    date.setDate(date.getDate() + 5);
+    const dateStr = date.toISOString().split('T')[0];
     const res = await app.inject({
       method: 'GET',
-      url: '/api/event-types/nonexistent/slots?date=2030-06-15',
+      url: `/api/event-types/nonexistent/slots?date=${dateStr}`,
     });
     expect(res.statusCode).toBe(404);
   });

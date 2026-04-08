@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { EventType } from '@app/api';
+import i18n from '../i18n';
 import * as eventTypesModule from '../api/eventTypes';
 import { LandingPage } from './LandingPage';
 
@@ -37,6 +38,7 @@ function renderPage() {
 describe('LandingPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    i18n.changeLanguage('ru');
   });
 
   it('показывает список карточек с типами встреч', async () => {

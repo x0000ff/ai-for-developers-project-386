@@ -6,32 +6,34 @@ import {
   Modal,
   NumberInput,
   Stack,
-  Table,
   Tabs,
   Text,
   Textarea,
   TextInput,
+  Table,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { CalendarClock, Edit2, Plus, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import { bookingsApi } from '../api/bookings';
 import { eventTypesApi } from '../api/eventTypes';
 import { Navbar } from '../components/Navbar';
+import { getLocale } from '../utils/locale';
 
 import type { Booking, EventType } from '@app/api';
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('ru-RU', {
+function formatDate(iso: string, locale: string): string {
+  return new Date(iso).toLocaleDateString(locale, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
   });
 }
 
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('ru-RU', {
+function formatTime(iso: string, locale: string): string {
+  return new Date(iso).toLocaleTimeString(locale, {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -60,6 +62,7 @@ function EventTypeForm({
   onCancel: () => void;
   loading: boolean;
 }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState<EventTypeFormData>(initial);
 
   useEffect(() => {
@@ -83,8 +86,8 @@ function EventTypeForm({
   return (
     <Stack gap={12} onKeyDown={handleKeyDown} tabIndex={0}>
       <TextInput
-        label="Название"
-        placeholder="Например: Консультация 30 мин"
+        label={t('admin.formLabelName')}
+        placeholder={t('admin.formNamePlaceholder')}
         value={form.name}
         onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
         required
@@ -94,7 +97,7 @@ function EventTypeForm({
         }}
       />
       <NumberInput
-        label="Длительность (минуты)"
+        label={t('admin.formLabelDuration')}
         placeholder="30"
         value={form.durationMinutes}
         onChange={(val) => setForm((f) => ({ ...f, durationMinutes: val }))}
@@ -107,8 +110,8 @@ function EventTypeForm({
         }}
       />
       <Textarea
-        label="Описание"
-        placeholder="Краткое описание встречи"
+        label={t('admin.formLabelDescription')}
+        placeholder={t('admin.formDescriptionPlaceholder')}
         value={form.description}
         onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
         rows={3}
@@ -131,7 +134,7 @@ function EventTypeForm({
             },
           }}
         >
-          Отмена
+          {t('admin.cancelButton')}
         </Button>
         <Button
           onClick={() => onSubmit(form)}
@@ -147,7 +150,7 @@ function EventTypeForm({
             },
           }}
         >
-          Сохранить
+          {t('admin.saveButton')}
         </Button>
       </Group>
     </Stack>
@@ -155,6 +158,8 @@ function EventTypeForm({
 }
 
 export function AdminPage() {
+  const { t, i18n } = useTranslation();
+  const locale = getLocale(i18n.language);
   const isMobile = useMediaQuery('(max-width: 600px)');
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') ?? 'bookings';
@@ -194,7 +199,7 @@ export function AdminPage() {
       const data = await bookingsApi.listUpcoming();
       setBookings(data);
     } catch (err) {
-      setBookingsError(err instanceof Error ? err.message : 'Ошибка загрузки');
+      setBookingsError(err instanceof Error ? err.message : t('admin.errorLoading'));
     } finally {
       setBookingsLoading(false);
     }
@@ -207,7 +212,7 @@ export function AdminPage() {
       const data = await eventTypesApi.list();
       setEventTypes(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки');
+      setError(err instanceof Error ? err.message : t('admin.errorLoading'));
     } finally {
       setLoading(false);
     }
@@ -225,7 +230,7 @@ export function AdminPage() {
       setEventTypes((prev) => [...prev, created]);
       setCreateOpen(false);
     } catch (err) {
-      setCreateError(err instanceof Error ? err.message : 'Ошибка создания');
+      setCreateError(err instanceof Error ? err.message : t('admin.errorCreating'));
     } finally {
       setCreateLoading(false);
     }
@@ -244,7 +249,7 @@ export function AdminPage() {
       setEventTypes((prev) => prev.map((et) => (et.id === updated.id ? updated : et)));
       setEditTarget(null);
     } catch (err) {
-      setEditError(err instanceof Error ? err.message : 'Ошибка обновления');
+      setEditError(err instanceof Error ? err.message : t('admin.errorUpdating'));
     } finally {
       setEditLoading(false);
     }
@@ -272,7 +277,7 @@ export function AdminPage() {
       setEventTypes((prev) => prev.filter((et) => et.id !== deleteTarget.id));
       setDeleteTarget(null);
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : 'Ошибка удаления');
+      setDeleteError(err instanceof Error ? err.message : t('admin.errorDeleting'));
     } finally {
       setDeleteLoading(false);
     }
@@ -306,10 +311,10 @@ export function AdminPage() {
         >
           <Tabs.List>
             <Tabs.Tab value="bookings" leftSection={<CalendarClock size={15} strokeWidth={2} />}>
-              Предстоящие встречи
+              {t('admin.tabBookings')}
             </Tabs.Tab>
             <Tabs.Tab value="event-types" leftSection={<ShieldCheck size={15} strokeWidth={2} />}>
-              Типы встреч
+              {t('admin.tabEventTypes')}
             </Tabs.Tab>
           </Tabs.List>
 
@@ -345,7 +350,7 @@ export function AdminPage() {
                 }}
               >
                 <Plus size={16} strokeWidth={2} />
-                Создать
+                {t('admin.createButton')}
               </button>
             </div>
 
@@ -395,7 +400,7 @@ export function AdminPage() {
                     margin: 0,
                   }}
                 >
-                  Пока нет ни одного типа встречи. Нажмите «Создать», чтобы добавить первый.
+                  {t('admin.emptyEventTypes')}
                 </p>
               </div>
             )}
@@ -433,9 +438,9 @@ export function AdminPage() {
                 >
                   <Table.Thead>
                     <Table.Tr>
-                      <Table.Th style={{ width: 140 }}>Длительность</Table.Th>
-                      <Table.Th>Название</Table.Th>
-                      <Table.Th>Описание</Table.Th>
+                      <Table.Th style={{ width: 140 }}>{t('admin.colDuration')}</Table.Th>
+                      <Table.Th>{t('admin.colName')}</Table.Th>
+                      <Table.Th>{t('admin.colDescription')}</Table.Th>
                       <Table.Th style={{ width: 100 }}></Table.Th>
                     </Table.Tr>
                   </Table.Thead>
@@ -455,7 +460,7 @@ export function AdminPage() {
                               fontWeight: 500,
                             }}
                           >
-                            {et.durationMinutes} мин
+                            {t('admin.minutesSuffix', { count: et.durationMinutes })}
                           </span>
                         </Table.Td>
                         <Table.Td>
@@ -474,7 +479,7 @@ export function AdminPage() {
                                 setEditError(null);
                                 setEditTarget(et);
                               }}
-                              title="Редактировать"
+                              title={t('admin.tooltipEdit')}
                               style={{ color: 'var(--fg-muted)' }}
                             >
                               <Edit2 size={15} strokeWidth={2} />
@@ -486,7 +491,7 @@ export function AdminPage() {
                                 setDeleteError(null);
                                 setDeleteTarget(et);
                               }}
-                              title="Удалить"
+                              title={t('admin.tooltipDelete')}
                             >
                               <Trash2 size={15} strokeWidth={2} />
                             </ActionIcon>
@@ -529,7 +534,7 @@ export function AdminPage() {
                 }}
               >
                 <RefreshCw size={14} strokeWidth={2} />
-                Обновить
+                {t('admin.refreshButton')}
               </button>
             </div>
 
@@ -580,7 +585,7 @@ export function AdminPage() {
                     margin: 0,
                   }}
                 >
-                  Предстоящих встреч пока нет.
+                  {t('admin.emptyBookings')}
                 </p>
               </div>
             )}
@@ -619,11 +624,11 @@ export function AdminPage() {
                 >
                   <Table.Thead>
                     <Table.Tr>
-                      <Table.Th>Дата</Table.Th>
-                      <Table.Th>Время</Table.Th>
-                      <Table.Th>Тип встречи</Table.Th>
-                      <Table.Th>Гость</Table.Th>
-                      <Table.Th>Email</Table.Th>
+                      <Table.Th>{t('admin.colDate')}</Table.Th>
+                      <Table.Th>{t('admin.colTime')}</Table.Th>
+                      <Table.Th>{t('admin.colMeetingType')}</Table.Th>
+                      <Table.Th>{t('admin.colGuest')}</Table.Th>
+                      <Table.Th>{t('admin.colEmail')}</Table.Th>
                       <Table.Th style={{ width: 60 }}></Table.Th>
                     </Table.Tr>
                   </Table.Thead>
@@ -632,7 +637,7 @@ export function AdminPage() {
                       <Table.Tr key={b.id}>
                         <Table.Td>
                           <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {formatDate(b.startsAt)}
+                            {formatDate(b.startsAt, locale)}
                           </span>
                         </Table.Td>
                         <Table.Td>
@@ -642,7 +647,7 @@ export function AdminPage() {
                               color: 'var(--fg-muted)',
                             }}
                           >
-                            {formatTime(b.startsAt)} – {formatTime(b.endsAt)}
+                            {formatTime(b.startsAt, locale)} – {formatTime(b.endsAt, locale)}
                           </span>
                         </Table.Td>
                         <Table.Td>
@@ -662,16 +667,18 @@ export function AdminPage() {
                                 fontStyle: 'italic',
                               }}
                             >
-                              Тип удалён
+                              {t('admin.deletedTypeBadge')}
                             </span>
                           ) : (
                             <span style={{ fontWeight: 500 }}>
                               <span style={{ color: 'var(--fg-muted)', fontWeight: 400 }}>
-                                {Math.round(
-                                  (new Date(b.endsAt).getTime() - new Date(b.startsAt).getTime()) /
-                                    60000,
-                                )}{' '}
-                                мин
+                                {t('admin.minutesSuffix', {
+                                  count: Math.round(
+                                    (new Date(b.endsAt).getTime() -
+                                      new Date(b.startsAt).getTime()) /
+                                      60000,
+                                  ),
+                                })}
                               </span>
                               {' • '}
                               <span>{b.eventTypeName}</span>
@@ -686,7 +693,7 @@ export function AdminPage() {
                           <ActionIcon
                             variant="subtle"
                             color="red"
-                            title="Удалить встречу"
+                            title={t('admin.tooltipDeleteMeeting')}
                             onClick={() => {
                               setDeletingBookingId(b.id);
                               setDeleteBookingModalOpen(true);
@@ -719,7 +726,7 @@ export function AdminPage() {
               color: 'var(--fg)',
             }}
           >
-            Новый тип встречи
+            {t('admin.modalCreateTitle')}
           </Text>
         }
         centered
@@ -755,7 +762,7 @@ export function AdminPage() {
               color: 'var(--fg)',
             }}
           >
-            Редактировать
+            {t('admin.modalEditTitle')}
           </Text>
         }
         centered
@@ -797,7 +804,7 @@ export function AdminPage() {
               color: 'var(--fg)',
             }}
           >
-            Удалить встречу
+            {t('admin.modalDeleteBookingTitle')}
           </Text>
         }
         centered
@@ -809,7 +816,7 @@ export function AdminPage() {
       >
         <Stack gap={16}>
           <Text style={{ fontFamily: 'var(--font)', fontSize: 14, color: 'var(--fg)' }}>
-            Вы уверены, что хотите удалить эту встречу? Это действие нельзя отменить.
+            {t('admin.modalDeleteBookingBody')}
           </Text>
           <Group justify="flex-end" gap={8}>
             <Button
@@ -825,7 +832,7 @@ export function AdminPage() {
                 },
               }}
             >
-              Отмена
+              {t('admin.cancelButton')}
             </Button>
             <Button
               onClick={handleDeleteBooking}
@@ -842,7 +849,7 @@ export function AdminPage() {
                 },
               }}
             >
-              Удалить
+              {t('admin.deleteButton')}
             </Button>
           </Group>
         </Stack>
@@ -862,7 +869,7 @@ export function AdminPage() {
               color: 'var(--fg)',
             }}
           >
-            Удалить тип встречи
+            {t('admin.modalDeleteEventTypeTitle')}
           </Text>
         }
         centered
@@ -874,8 +881,11 @@ export function AdminPage() {
       >
         <Stack gap={16}>
           <Text style={{ fontFamily: 'var(--font)', fontSize: 14, color: 'var(--fg)' }}>
-            Удалить <strong style={{ color: 'var(--fg)' }}>{deleteTarget?.name}</strong>? Это
-            действие нельзя отменить.
+            <Trans
+              i18nKey="admin.modalDeleteEventTypeBody"
+              values={{ name: deleteTarget?.name }}
+              components={{ bold: <strong style={{ color: 'var(--fg)' }} /> }}
+            />
           </Text>
           {deleteError && (
             <Text size="sm" style={{ color: 'var(--danger)', fontFamily: 'var(--font)' }}>
@@ -896,7 +906,7 @@ export function AdminPage() {
                 },
               }}
             >
-              Отмена
+              {t('admin.cancelButton')}
             </Button>
             <Button
               onClick={handleDelete}
@@ -912,7 +922,7 @@ export function AdminPage() {
                 },
               }}
             >
-              Удалить
+              {t('admin.deleteButton')}
             </Button>
           </Group>
         </Stack>
