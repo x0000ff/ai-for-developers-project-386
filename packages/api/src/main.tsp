@@ -6,6 +6,11 @@ using TypeSpec.Http;
 @service({ title: "Book a call API" })
 namespace BookACall;
 
+/** Generic error response body */
+model ErrorResponse {
+  message: string;
+}
+
 /** A single available time slot */
 model Slot {
   startsAt: utcDateTime;
@@ -32,6 +37,38 @@ model UpdateEventTypeRequest {
   name: string;
   description?: string;
   durationMinutes: int32;
+}
+
+/** A confirmed booking */
+model Booking {
+  id: string;
+  eventTypeId: string | null;
+  eventTypeName: string;
+  startsAt: utcDateTime;
+  endsAt: utcDateTime;
+  guestName: string;
+  guestEmail: string;
+}
+
+/** Request body for creating a new booking */
+model CreateBookingRequest {
+  eventTypeId: string;
+  startsAt: utcDateTime;
+  guestName: string;
+  guestEmail: string;
+}
+
+@route("/api/bookings")
+interface Bookings {
+  /** Create a booking; 400 if past, 404 if unknown eventType, 409 if conflict */
+  @post create(@body body: CreateBookingRequest):
+    | { @statusCode statusCode: 201; @body body: Booking; }
+    | { @statusCode statusCode: 400; @body body: ErrorResponse; }
+    | { @statusCode statusCode: 404; @body body: ErrorResponse; }
+    | { @statusCode statusCode: 409; @body body: ErrorResponse; };
+
+  /** List upcoming bookings sorted by startsAt ASC */
+  @get list(): Booking[];
 }
 
 @route("/api/event-types")

@@ -15,6 +15,13 @@
       "when": 1775658313000,
       "tag": "0001_peaceful_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1744128000000,
+      "tag": "0002_add_bookings_constraints",
+      "breakpoints": true
     }
   ]
 }

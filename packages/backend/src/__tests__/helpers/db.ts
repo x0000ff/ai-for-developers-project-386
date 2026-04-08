@@ -11,6 +11,7 @@ const migrationsFolder = path.join(__dirname, '../../../drizzle');
 /** Create an in-memory SQLite database with all migrations applied. */
 export function createTestDb() {
   const sqlite = new Database(':memory:');
+  sqlite.pragma('foreign_keys = ON');
   const db = drizzle(sqlite, { schema });
   migrate(db, { migrationsFolder });
   return { db, sqlite };
