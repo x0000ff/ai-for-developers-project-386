@@ -7,7 +7,14 @@ import { bookingsApi, ApiError } from '../api/bookings';
 import { eventTypesApi } from '../api/eventTypes';
 import { Navbar } from '../components/Navbar';
 
-const today = new Date().toISOString().split('T')[0];
+function toLocalDateString(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+const today = toLocalDateString(new Date());
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
@@ -56,7 +63,7 @@ export function BookCallPage() {
     setSubmitError(null);
     setIsConflict(false);
 
-    const dateStr = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
+    const dateStr = selectedDate ? toLocalDateString(selectedDate) : '';
 
     if (!selectedEventTypeId || !dateStr) {
       setSlots([]);
@@ -95,10 +102,7 @@ export function BookCallPage() {
         setSelectedSlot(null);
         setSlotsLoading(true);
         bookingsApi
-          .getSlots(
-            selectedEventTypeId,
-            selectedDate ? selectedDate.toISOString().split('T')[0] : '',
-          )
+          .getSlots(selectedEventTypeId, selectedDate ? toLocalDateString(selectedDate) : '')
           .then(setSlots)
           .catch(() => {})
           .finally(() => setSlotsLoading(false));
