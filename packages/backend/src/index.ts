@@ -18,6 +18,11 @@ app.register(fastifyStatic, {
   prefix: '/',
 });
 
+// SPA fallback: return index.html for all non-API, non-asset routes
+app.setNotFoundHandler((_req, reply) => {
+  reply.sendFile('index.html');
+});
+
 const start = async () => {
   try {
     await app.listen({ port: Number(process.env.PORT) || 3000, host: '0.0.0.0' });
