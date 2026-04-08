@@ -408,8 +408,8 @@ export function AdminPage() {
                 >
                   <Table.Thead>
                     <Table.Tr>
-                      <Table.Th>Название</Table.Th>
                       <Table.Th style={{ width: 140 }}>Длительность</Table.Th>
+                      <Table.Th>Название</Table.Th>
                       <Table.Th>Описание</Table.Th>
                       <Table.Th style={{ width: 100 }}></Table.Th>
                     </Table.Tr>
@@ -417,9 +417,6 @@ export function AdminPage() {
                   <Table.Tbody>
                     {eventTypes.map((et) => (
                       <Table.Tr key={et.id}>
-                        <Table.Td>
-                          <span style={{ fontWeight: 500 }}>{et.name}</span>
-                        </Table.Td>
                         <Table.Td>
                           <span
                             style={{
@@ -435,6 +432,9 @@ export function AdminPage() {
                           >
                             {et.durationMinutes} мин
                           </span>
+                        </Table.Td>
+                        <Table.Td>
+                          <span style={{ fontWeight: 500 }}>{et.name}</span>
                         </Table.Td>
                         <Table.Td>
                           <span style={{ color: 'var(--fg-muted)' }}>
