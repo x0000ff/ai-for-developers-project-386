@@ -12,6 +12,7 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { CalendarClock, Edit2, Plus, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { bookingsApi } from '../api/bookings';
@@ -153,6 +154,7 @@ function EventTypeForm({
 }
 
 export function AdminPage() {
+  const isMobile = useMediaQuery('(max-width: 600px)');
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -271,12 +273,14 @@ export function AdminPage() {
           defaultValue="event-types"
           keepMounted
           variant="pills"
-          orientation="vertical"
+          orientation={isMobile ? 'horizontal' : 'vertical'}
           styles={{
-            root: { display: 'flex', alignItems: 'flex-start', gap: 0 },
-            list: { width: 200, flexShrink: 0 },
+            root: isMobile
+              ? { display: 'flex', flexDirection: 'column', gap: 0 }
+              : { display: 'flex', alignItems: 'flex-start', gap: 0 },
+            list: isMobile ? { marginBottom: 20 } : { width: 200, flexShrink: 0 },
             tab: { fontFamily: 'var(--font)', fontWeight: 500, fontSize: 14 },
-            panel: { flex: 1, paddingLeft: 24 },
+            panel: isMobile ? {} : { flex: 1, paddingLeft: 24 },
           }}
         >
           <Tabs.List>
@@ -380,7 +384,7 @@ export function AdminPage() {
                 style={{
                   border: '1px solid var(--border)',
                   borderRadius: 12,
-                  overflow: 'hidden',
+                  overflow: 'auto',
                   background: 'white',
                 }}
               >
@@ -566,7 +570,7 @@ export function AdminPage() {
                 style={{
                   border: '1px solid var(--border)',
                   borderRadius: 12,
-                  overflow: 'hidden',
+                  overflow: 'auto',
                   background: 'white',
                 }}
               >
