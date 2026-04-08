@@ -13,3 +13,16 @@ export const eventTypes = sqliteTable('event_types', {
     .notNull()
     .default(sql`(datetime('now'))`),
 });
+
+export const bookings = sqliteTable('bookings', {
+  id: text('id').primaryKey(),
+  eventTypeId: text('event_type_id'),
+  eventTypeName: text('event_type_name').notNull(),
+  startsAt: integer('starts_at').notNull(),
+  endsAt: integer('ends_at').notNull(),
+  guestName: text('guest_name').notNull(),
+  guestEmail: text('guest_email').notNull(),
+  createdAt: text('created_at')
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});

@@ -6,6 +6,12 @@ using TypeSpec.Http;
 @service({ title: "Book a call API" })
 namespace BookACall;
 
+/** A single available time slot */
+model Slot {
+  startsAt: utcDateTime;
+  endsAt: utcDateTime;
+}
+
 /** Represents a meeting type that guests can book */
 model EventType {
   id: string;
@@ -51,4 +57,7 @@ interface EventTypes {
   @delete delete(@path id: string): {
     @statusCode statusCode: 204;
   } | NotFoundResponse;
+
+  /** List available slots for an event type on a given date */
+  @get @route("{id}/slots") slots(@path id: string, @query date: string): Slot[] | NotFoundResponse;
 }

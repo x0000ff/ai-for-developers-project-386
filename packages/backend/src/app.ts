@@ -2,6 +2,7 @@ import Fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
 import { sql } from 'drizzle-orm';
 import type { Db } from './db/index.js';
 import { eventTypesRoutes } from './routes/eventTypes.js';
+import { slotsRoutes } from './routes/slots.js';
 
 export function buildApp(opts: FastifyServerOptions & { db: Db }): FastifyInstance {
   const { db, ...fastifyOpts } = opts;
@@ -17,6 +18,7 @@ export function buildApp(opts: FastifyServerOptions & { db: Db }): FastifyInstan
   });
 
   app.register(eventTypesRoutes, { prefix: '/api', db });
+  app.register(slotsRoutes, { prefix: '/api', db });
 
   return app;
 }
