@@ -15,6 +15,7 @@ import {
 import { useMediaQuery } from '@mantine/hooks';
 import { CalendarClock, Edit2, Plus, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { bookingsApi } from '../api/bookings';
 import { eventTypesApi } from '../api/eventTypes';
 import { Navbar } from '../components/Navbar';
@@ -155,6 +156,8 @@ function EventTypeForm({
 
 export function AdminPage() {
   const isMobile = useMediaQuery('(max-width: 600px)');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') ?? 'bookings';
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -287,7 +290,8 @@ export function AdminPage() {
         }}
       >
         <Tabs
-          defaultValue="event-types"
+          value={activeTab}
+          onChange={(value) => setSearchParams({ tab: value ?? 'bookings' })}
           keepMounted
           variant="pills"
           orientation={isMobile ? 'horizontal' : 'vertical'}
@@ -301,11 +305,11 @@ export function AdminPage() {
           }}
         >
           <Tabs.List>
-            <Tabs.Tab value="event-types" leftSection={<ShieldCheck size={15} strokeWidth={2} />}>
-              Типы встреч
-            </Tabs.Tab>
             <Tabs.Tab value="bookings" leftSection={<CalendarClock size={15} strokeWidth={2} />}>
               Предстоящие встречи
+            </Tabs.Tab>
+            <Tabs.Tab value="event-types" leftSection={<ShieldCheck size={15} strokeWidth={2} />}>
+              Типы встреч
             </Tabs.Tab>
           </Tabs.List>
 
